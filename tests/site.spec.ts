@@ -57,35 +57,24 @@ test('image dialog contains keyboard focus, closes and survives page navigation'
 	expect(errors).toEqual([]);
 });
 
-test('community rendering stops offscreen and reduced motion still allows keyboard selection', async ({ page }) => {
+test('community directory lists every partner without overflowing', async ({ page }) => {
 	await page.goto('/');
-	const stage = page.locator('#community-stage');
-	await stage.scrollIntoViewIfNeeded();
-	await expect(page.locator('[data-community-card]').first()).toHaveAttribute('style', /translate3d/);
-	await page.evaluate(() => {
-		const deck = document.querySelector('[data-community-deck]')!;
-		deck.setAttribute('data-test-mutations', '0');
-		new MutationObserver(records => {
-			const count = records.filter(record => record.attributeName === 'style').length;
-			if (count) deck.setAttribute('data-test-mutations', String(Number(deck.getAttribute('data-test-mutations')) + count));
-		}).observe(deck, { attributes: true, subtree: true, attributeFilter: ['style'] });
-	});
-	const mutations = () => page.locator('[data-community-deck]').getAttribute('data-test-mutations');
-	await expect.poll(mutations).not.toBe('0');
-	await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-	await page.waitForTimeout(300);
-	const count = await mutations();
-	await page.waitForTimeout(300);
-	expect(await mutations()).toBe(count);
-	await page.emulateMedia({ reducedMotion: 'reduce' });
-	await stage.scrollIntoViewIfNeeded();
-	await stage.focus();
-	await page.keyboard.press('ArrowRight');
-	await expect(page.locator('[data-community-name]')).toHaveText('Build with AI');
-	await page.waitForTimeout(100);
-	const reducedCount = await mutations();
-	await page.waitForTimeout(300);
-	expect(await mutations()).toBe(reducedCount);
+	const section = page.locator('#communities');
+	await section.scrollIntoViewIfNeeded();
+	for (const name of [
+		'Build Club',
+		'Build with AI',
+		'AI Tinkerers',
+		'AI Hackerdorm',
+		'AI SEA',
+		'KrackedDevs',
+		'Rakan Tutor',
+		'CoderPuffs',
+		'Cursor KL',
+	]) {
+		await expect(section.getByRole('heading', { name, exact: true })).toBeVisible();
+	}
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
 });
 
 test('event autoplay advances over the background and resumes after card interaction', async ({ page, isMobile }) => {
