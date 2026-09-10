@@ -29,13 +29,17 @@ import { LUMA_URL } from '../consts';
 
 	<section class="hero-card" aria-labelledby="hero-title">
 		<div class="hero-copy">
-			<h1 id="hero-title">Driving Malaysia's<br />AI progress.</h1>
+			<h1 id="hero-title">Learn, build and<br />experience Malaysian AI.</h1>
 			<p class="intro">
-				The home of AI builders in Malaysia. Start with a workshop, meet the people building
-				around you, and make something of your own.
+				Discover Malaysia's AI communities and events — meetups, builder groups, and workshops
+				across the country. Find your people, join what's happening, or add your community to
+				the list.
 			</p>
 		</div>
-		<a class="card-link site-button" href={LUMA_URL}>Explore Malaysian AI</a>
+		<div class="hero-actions">
+			<a class="card-link site-button" href={LUMA_URL}>View upcoming events</a>
+			<a class="card-secondary" href="#communities">Explore communities</a>
+		</div>
 	</section>
 </div>
 
@@ -59,7 +63,7 @@ import { LUMA_URL } from '../consts';
 		--hero-line: var(--border-color);
 		--hero-accent: #315d9f;
 		--hero-gap: 1rem;
-		--hero-panel-width: 29rem;
+		--hero-panel-width: 32rem;
 		--hero-brand-width: 7.2rem;
 		--hero-control-height: 2.25rem;
 		--hero-header-height: calc(var(--hero-gap) * 2 + var(--hero-control-height));
@@ -181,13 +185,20 @@ import { LUMA_URL } from '../consts';
 	}
 
 	.intro {
-		max-width: 27rem;
+		max-width: 30rem;
 		margin: 1.2rem 0 1.3rem;
 		color: rgb(255 255 255 / 0.9);
 		font-size: clamp(0.86rem, 1vw, 0.94rem);
 		line-height: 1.42;
 		text-shadow: 0 1px 14px rgb(2 12 13 / 0.5);
 		animation: soft-rise 0.7s 0.85s ease-out both;
+	}
+
+	.hero-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.7rem 1.1rem;
+		align-items: center;
 	}
 
 	.card-link {
@@ -199,6 +210,18 @@ import { LUMA_URL } from '../consts';
 	.card-link:hover,
 	.card-link:focus-visible {
 		transform: translateY(-2px);
+	}
+
+	.card-secondary {
+		color: rgb(255 255 255 / 0.88);
+		font-size: 0.86rem;
+		text-underline-offset: 0.22em;
+		animation: soft-rise 0.65s 1.05s ease-out both;
+	}
+
+	.card-secondary:focus-visible {
+		outline: 2px solid #ffd29a;
+		outline-offset: 4px;
 	}
 
 	@keyframes soft-rise {
@@ -273,7 +296,7 @@ import { LUMA_URL } from '../consts';
 		}
 
 		.intro {
-			max-width: 20rem;
+			max-width: 24rem;
 			margin: 0.95rem 0 1.05rem;
 			font-size: 0.8rem;
 		}
@@ -286,6 +309,7 @@ import { LUMA_URL } from '../consts';
 		.hero-card h1,
 		.intro,
 		.card-link,
+		.card-secondary,
 		.hero-art {
 			animation: none;
 		}

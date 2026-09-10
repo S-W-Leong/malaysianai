@@ -1,4 +1,6 @@
 ---
+import { ADD_COMMUNITY_HREF, LUMA_URL } from '../consts';
+
 const communities = [
 	{
 		name: 'Build Club',
@@ -90,12 +92,17 @@ const startIndex = 0;
 	<div class="community-shell">
 		<div class="community-copy">
 			<div class="community-heading">
-				<h2 id="community-title">The people are<br />the platform.</h2>
+				<h2 id="community-title">Malaysia's AI<br />Communities and Events.</h2>
 			</div>
 			<p class="community-lede">
-				There is no single front door into AI here. There are many. Pick the room that
-				feels like yours and say hello.
+				A growing map of AI communities across Malaysia — meetups, builder groups, student
+				chapters, and everyone in between. Join an event, find your people, or add your
+				community to the list. Many gatherings are free and very welcoming.
 			</p>
+			<div class="community-actions">
+				<a class="site-button" href={LUMA_URL}>View upcoming events</a>
+				<a href={ADD_COMMUNITY_HREF}>Add your community</a>
+			</div>
 		</div>
 
 		<div
@@ -143,6 +150,14 @@ const startIndex = 0;
 				<h3 data-community-name>{communities[startIndex].name}</h3>
 			</div>
 			<p data-community-description>{communities[startIndex].description}</p>
+		</div>
+
+		<div class="community-invite">
+			<p>
+				Run a community that isn't listed yet? We're building this as a shared directory for
+				Malaysia's AI scene — filled in by the people who organise it.
+			</p>
+			<a href={ADD_COMMUNITY_HREF}>Submit a community <span aria-hidden="true">↗</span></a>
 		</div>
 	</div>
 </section>
@@ -394,6 +409,36 @@ const startIndex = 0;
 		margin: 0 auto;
 		color: rgb(224 232 244 / 0.72);
 		font-size: clamp(0.92rem, 1.25vw, 1.08rem);
+		line-height: var(--leading-body);
+	}
+
+	.community-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem 1.1rem;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.community-actions a:not(.site-button),
+	.community-invite a {
+		color: inherit;
+		text-underline-offset: 0.22em;
+	}
+
+	.community-invite {
+		display: grid;
+		gap: 0.85rem;
+		justify-items: center;
+		width: min(36rem, 100%);
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.community-invite p {
+		margin: 0;
+		color: rgb(224 232 244 / 0.68);
+		font-size: clamp(0.9rem, 1.15vw, 1.02rem);
 		line-height: var(--leading-body);
 	}
 
