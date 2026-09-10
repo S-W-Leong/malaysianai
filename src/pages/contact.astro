@@ -19,15 +19,15 @@ import { ADD_COMMUNITY_WHATSAPP, CONTACT_WHATSAPP, LUMA_URL, VENUE_ADDRESS, VENU
 
 <script>
 	const subject = new URLSearchParams(location.search).get('subject') ?? '';
-	if (!subject.toLowerCase().includes('add my community')) return;
-
-	const title = 'Add your community';
-	const description = "Tell us about your community — name, website, what you run, and where you meet. We'll get you into the directory.";
-	document.title = `${title} | Malaysian AI`;
-	const heading = document.querySelector('.info-page h1');
-	const lede = document.querySelector('.info-page header p');
-	const whatsapp = document.querySelector<HTMLAnchorElement>('#contact-whatsapp');
-	if (heading) heading.textContent = title;
-	if (lede) lede.textContent = description;
-	if (whatsapp?.dataset.communityHref) whatsapp.href = whatsapp.dataset.communityHref;
+	if (subject.toLowerCase().includes('add my community')) {
+		const title = 'Add your community';
+		const description = "Tell us about your community — name, website, what you run, and where you meet. We'll get you into the directory.";
+		document.title = `${title} | Malaysian AI`;
+		const heading = document.querySelector('.info-page h1');
+		const lede = document.querySelector('.info-page header p');
+		const whatsapp = document.querySelector<HTMLAnchorElement>('#contact-whatsapp');
+		if (heading) heading.textContent = title;
+		if (lede) lede.textContent = description;
+		if (whatsapp?.dataset.communityHref) whatsapp.href = whatsapp.dataset.communityHref;
+	}
 </script>
