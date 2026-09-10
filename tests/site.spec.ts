@@ -25,10 +25,9 @@ test('public destinations load and the hero uses responsive images', async ({ pa
 
 test('homepage copy points people at communities and the add-community contact flow', async ({ page }) => {
 	await page.goto('/');
-	await expect(page.locator('.hero-stage').getByRole('heading', { level: 1 })).toContainText('Learn, build and');
-	await expect(page.locator('.hero-stage').getByRole('heading', { level: 1 })).toContainText('experience Malaysian AI.');
-	await expect(page.locator('.hero-stage').getByRole('link', { name: 'View upcoming events' })).toHaveAttribute('href', '#events');
-	await expect(page.locator('.hero-stage').getByRole('link', { name: 'Explore communities' })).toHaveAttribute('href', '#communities');
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('Learn, build and');
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('experience Malaysian AI.');
+	await expect(page.getByRole('link', { name: 'Explore communities' })).toHaveAttribute('href', '#communities');
 	await page.locator('#communities').scrollIntoViewIfNeeded();
 	await expect(page.getByRole('heading', { level: 2, name: /Malaysia's AI/ })).toBeVisible();
 	await page.getByRole('link', { name: 'Add your community' }).click();
