@@ -1,5 +1,6 @@
 /* Shared typography and theme values. Component geometry stays with its component. */
 :root {
+	color-scheme: dark;
 	--font-body: 'Atkinson', system-ui, sans-serif;
 	--font-display: 'Instrument Serif', Baskerville, 'Iowan Old Style', 'Times New Roman', serif;
 	--font-pixel: 'Mondwest', 'Times New Roman', Times, serif;
