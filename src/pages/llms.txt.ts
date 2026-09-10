@@ -20,7 +20,7 @@ export const GET: APIRoute = async ({ site }) => {
 		link('Terms', '/terms', 'The residency terms of service.'), '',
 		'## Homepage sections', '',
 		link('Events', '/#events', 'Community events and a link to the Luma calendar.'),
-		link('Communities', '/#communities', 'Independent AI communities and organisers.'), '',
+		link('Communities', '/#communities', 'Independent AI communities and organisers, including Build Club, Build with AI, AI Tinkerers, AI Hackerdorm, AI SEA, KrackedDevs, Rakan Tutor, CoderPuffs, and Cursor KL.'), '',
 		'## Blog posts', '',
 		...posts.map(post => link(post.data.title, `/blog/${post.id}`, post.data.description)), '',
 	].join('\n');
