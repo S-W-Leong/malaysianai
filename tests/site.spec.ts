@@ -196,3 +196,25 @@ test('mobile navigation closes on Escape and after selecting a destination', asy
 	await expect(page).toHaveURL(/\/blog\/?$/);
 	await expect(menu).not.toHaveAttribute('open', '');
 });
+
+test('theme toggle follows the system scheme and can lock light or dark', async ({ page }) => {
+	await page.emulateMedia({ colorScheme: 'dark' });
+	await page.goto('/');
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+	await expect(page.locator('html')).toHaveAttribute('data-theme-preference', 'system');
+	await expect(page.getByRole('radio', { name: 'System' })).toHaveAttribute('aria-checked', 'true');
+	await expect(page.locator('.hero-cta-panel').getByRole('radio')).toHaveCount(0);
+	await page.getByRole('radio', { name: 'Light' }).click();
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+	await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(239, 232, 216)');
+	expect(await page.evaluate(() => localStorage.getItem('malaysianai-theme'))).toBe('light');
+	await page.locator('.footer-company').getByRole('link', { name: 'About', exact: true }).click();
+	await expect(page).toHaveURL(/\/about\/?$/);
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+	await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(243, 240, 234)');
+	await page.getByRole('radio', { name: 'Dark' }).click();
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+	await page.getByRole('radio', { name: 'System' }).click();
+	await expect(page.locator('html')).toHaveAttribute('data-theme-preference', 'system');
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});

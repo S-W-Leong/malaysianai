@@ -96,7 +96,7 @@
 		margin-top: clamp(7rem, 15vh, 12rem);
 		margin-left: auto;
 		padding-top: clamp(1.5rem, 3vw, 2.5rem);
-		border-top: 1px solid rgb(115 152 207 / 0.32);
+		border-top: 1px solid var(--hairline-soft);
 	}
 
 	.host-mark {
@@ -116,17 +116,21 @@
 		filter: grayscale(1) invert(1) brightness(1.4);
 	}
 
+	:global(html[data-theme='light']) .host-mark img {
+		filter: none;
+	}
+
 	.host-copy {
 		max-width: 42rem;
 		margin: 0;
-		color: rgb(224 232 244 / 0.68);
+		color: var(--text-soft);
 		font-size: clamp(0.96rem, 1.2vw, 1.08rem);
 		line-height: var(--leading-body);
 	}
 
 	.host-copy a {
-		color: #dce9fb;
-		text-decoration-color: rgb(169 199 239 / 0.48);
+		color: var(--link-bright);
+		text-decoration-color: var(--hairline);
 		text-underline-offset: 0.22rem;
 	}
 

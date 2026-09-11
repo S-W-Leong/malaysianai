@@ -26,7 +26,7 @@
 
 :root {
 	font-family: var(--font-body);
-	color: #102b2a;
+	color: var(--page-text);
 	background: var(--site-background);
 	font-synthesis: none;
 }

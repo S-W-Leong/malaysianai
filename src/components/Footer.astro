@@ -1,4 +1,5 @@
 ---
+import ThemeToggle from './ThemeToggle.astro';
 import { AIMTO_URL, LUMA_URL } from '../consts';
 const year = new Date().getFullYear();
 
@@ -63,13 +64,16 @@ const groups = [
 	</div>
 
 	<div class="footer-wordmark" aria-hidden="true">Malaysian AI</div>
+	<div class="footer-appearance">
+		<ThemeToggle />
+	</div>
 </footer>
 
 <style>
 	.site-footer {
 		position: relative;
 		overflow: hidden;
-		padding: clamp(4rem, 7vw, 6.5rem) clamp(1.25rem, 4vw, 4rem) clamp(2rem, 4vw, 3.5rem);
+		padding: clamp(4rem, 7vw, 6.5rem) clamp(1.25rem, 4vw, 4rem) clamp(2.5rem, 5vw, 4rem);
 		color: var(--footer-text);
 		background: var(--site-background);
 	}
@@ -153,7 +157,7 @@ const groups = [
 	.footer-link-group a:focus-visible,
 	.footer-company a:hover,
 	.footer-company a:focus-visible {
-		color: var(--color-white);
+		color: var(--text-hover);
 	}
 
 	.footer-company {
@@ -185,6 +189,14 @@ const groups = [
 		user-select: none;
 	}
 
+	.footer-appearance {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		justify-content: center;
+		margin-top: 1.6rem;
+	}
+
 	@media (max-width: 900px) {
 		.footer-grid {
 			grid-template-columns: 1.5fr 1fr 1fr;
@@ -197,7 +209,7 @@ const groups = [
 
 	@media (max-width: 620px) {
 		.site-footer {
-			padding: 3.5rem 1.25rem 2rem;
+			padding: 3.5rem 1.25rem 2.5rem;
 		}
 
 		.footer-grid {
