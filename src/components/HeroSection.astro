@@ -50,7 +50,7 @@ import { LUMA_URL } from '../consts';
 	}
 
 	a:focus-visible {
-		outline: 2px solid #ffd29a;
+		outline: 2px solid var(--hero-focus);
 		outline-offset: 4px;
 	}
 
@@ -58,7 +58,7 @@ import { LUMA_URL } from '../consts';
 		position: relative;
 		isolation: isolate;
 		overflow: hidden;
-		color: #fffdf6;
+		color: var(--hero-copy);
 		--hero-frame: var(--page-background);
 		--hero-line: var(--border-color);
 		--hero-accent: #315d9f;
@@ -180,17 +180,17 @@ import { LUMA_URL } from '../consts';
 		letter-spacing: -0.035em;
 		line-height: 0.88;
 		text-wrap: balance;
-		text-shadow: 0 2px 24px rgb(2 12 13 / 0.35);
+		text-shadow: 0 2px 24px var(--hero-title-shadow-color);
 		animation: soft-rise 0.7s 0.7s ease-out both;
 	}
 
 	.intro {
 		max-width: 30rem;
 		margin: 1.2rem 0 1.3rem;
-		color: rgb(255 255 255 / 0.9);
+		color: var(--hero-muted);
 		font-size: clamp(0.86rem, 1vw, 0.94rem);
 		line-height: 1.42;
-		text-shadow: 0 1px 14px rgb(2 12 13 / 0.5);
+		text-shadow: 0 1px 14px var(--hero-copy-shadow-color);
 		animation: soft-rise 0.7s 0.85s ease-out both;
 	}
 
@@ -213,14 +213,14 @@ import { LUMA_URL } from '../consts';
 	}
 
 	.card-secondary {
-		color: rgb(255 255 255 / 0.88);
+		color: var(--hero-muted);
 		font-size: 0.86rem;
 		text-underline-offset: 0.22em;
 		animation: soft-rise 0.65s 1.05s ease-out both;
 	}
 
 	.card-secondary:focus-visible {
-		outline: 2px solid #ffd29a;
+		outline: 2px solid var(--hero-focus);
 		outline-offset: 4px;
 	}
 

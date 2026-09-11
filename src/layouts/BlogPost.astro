@@ -194,7 +194,7 @@ const coverImage = slug === 'largest-ai-learnathon'
 	.story-description {
 		width: 100%;
 		margin: 0.75rem auto 0;
-		color: rgb(235 241 249 / 0.78);
+		color: var(--text-soft);
 		font-size: clamp(0.95rem, 1.15vw, 1rem);
 		line-height: 1.45;
 	}
@@ -205,7 +205,7 @@ const coverImage = slug === 'largest-ai-learnathon'
 		gap: 0.65rem;
 		justify-content: center;
 		margin-top: 0.75rem;
-		color: rgb(235 241 249 / 0.58);
+		color: var(--text-softer);
 		font-size: 0.8rem;
 	}
 
@@ -248,7 +248,7 @@ const coverImage = slug === 'largest-ai-learnathon'
 
 	.story-body :global(p),
 	.story-body :global(li) {
-		color: rgb(238 244 252 / 0.82);
+		color: var(--story-copy);
 		font-size: 1.08rem;
 		line-height: 1.75;
 	}
@@ -294,7 +294,7 @@ const coverImage = slug === 'largest-ai-learnathon'
 	.story-body :global(blockquote) {
 		padding: 0.25rem 0 0.25rem clamp(1.25rem, 3vw, 2rem);
 		margin: clamp(2.5rem, 5vw, 4rem) 0;
-		border-left: 2px solid #315d9f;
+		border-left: 2px solid var(--accent-line);
 		color: var(--text-link);
 	}
 
@@ -307,19 +307,19 @@ const coverImage = slug === 'largest-ai-learnathon'
 	}
 
 	.story-body :global(a) {
-		color: #9ab7dd;
+		color: var(--text-link);
 		text-decoration-thickness: 1px;
 		text-underline-offset: 0.2em;
 	}
 
 	.story-body :global(a:hover),
 	.story-body :global(a:focus-visible) {
-		color: var(--color-white);
+		color: var(--text-hover);
 	}
 
 	.story-body :global(a:focus-visible),
 	.back-link:focus-visible {
-		outline: 2px solid #315d9f;
+		outline: 2px solid var(--accent-line);
 		outline-offset: 4px;
 	}
 
@@ -354,7 +354,7 @@ const coverImage = slug === 'largest-ai-learnathon'
 	.story-body :global(figcaption) {
 		max-width: 46rem;
 		margin: 0.85rem auto 0;
-		color: rgb(224 232 244 / 0.5);
+		color: var(--text-faint);
 		font-size: 0.82rem;
 		line-height: 1.5;
 	}
@@ -376,20 +376,20 @@ const coverImage = slug === 'largest-ai-learnathon'
 	.story-end p {
 		max-width: 31rem;
 		margin: 0;
-		color: rgb(224 232 244 / 0.62);
+		color: var(--text-soft);
 		font-size: var(--text-base);
 		line-height: 1.5;
 	}
 
 	.story-end .site-button {
-		color: #101820;
-		background: var(--color-white);
+		color: var(--button-text);
+		background: var(--button-background);
 	}
 
 	.story-end .site-button:hover,
 	.story-end .site-button:focus-visible {
-		color: #101820;
-		background: #edf0f4;
+		color: var(--button-text);
+		background: var(--button-hover-background);
 	}
 
 	.image-viewer {

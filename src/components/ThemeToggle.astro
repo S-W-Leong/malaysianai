@@ -1,0 +1,172 @@
+<div class="theme-toggle" role="radiogroup" aria-label="Appearance">
+	<button type="button" role="radio" data-theme-option="system" aria-checked="true" tabindex="0">System</button>
+	<button type="button" role="radio" data-theme-option="light" aria-checked="false" tabindex="-1">Light</button>
+	<button type="button" role="radio" data-theme-option="dark" aria-checked="false" tabindex="-1">Dark</button>
+</div>
+
+<script>
+	type Theme = 'light' | 'dark';
+	type ThemePreference = 'light' | 'dark' | 'system';
+	const STORAGE_KEY = 'malaysianai-theme';
+	const LIGHT_THEME_COLOR = '#f4efe6';
+	const DARK_THEME_COLOR = '#06090f';
+
+	function isPreference(value: string | null | undefined): value is ThemePreference {
+		return value === 'light' || value === 'dark' || value === 'system';
+	}
+
+	function systemTheme(): Theme {
+		return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+	}
+
+	function currentPreference(): ThemePreference {
+		const stored = document.documentElement.dataset.themePreference;
+		return isPreference(stored) ? stored : 'system';
+	}
+
+	function resolveTheme(preference: ThemePreference): Theme {
+		switch (preference) {
+			case 'light':
+			case 'dark':
+				return preference;
+			case 'system':
+				return systemTheme();
+			default: {
+				const exhaustive: never = preference;
+				return exhaustive;
+			}
+		}
+	}
+
+	function optionFromButton(button: HTMLButtonElement): ThemePreference {
+		return isPreference(button.dataset.themeOption) ? button.dataset.themeOption : 'system';
+	}
+
+	function applyPreference(preference: ThemePreference) {
+		const theme = resolveTheme(preference);
+		const root = document.documentElement;
+		root.dataset.theme = theme;
+		root.dataset.themePreference = preference;
+		root.style.colorScheme = theme;
+		localStorage.setItem(STORAGE_KEY, preference);
+		document.querySelector('meta[name="theme-color"]')?.setAttribute(
+			'content',
+			theme === 'light' ? LIGHT_THEME_COLOR : DARK_THEME_COLOR,
+		);
+		document.querySelectorAll<HTMLButtonElement>('[data-theme-option]').forEach(button => {
+			const selected = button.dataset.themeOption === preference;
+			button.setAttribute('aria-checked', selected ? 'true' : 'false');
+			button.tabIndex = selected ? 0 : -1;
+		});
+	}
+
+	function moveSelection(event: KeyboardEvent) {
+		const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'] as const;
+		type MoveKey = (typeof keys)[number];
+		if (!keys.includes(event.key as MoveKey)) return;
+
+		const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-theme-option]')];
+		if (buttons.length === 0) return;
+
+		const current = buttons.findIndex(button => button.getAttribute('aria-checked') === 'true');
+		const key = event.key as MoveKey;
+		let next = current < 0 ? 0 : current;
+		switch (key) {
+			case 'ArrowLeft':
+			case 'ArrowUp':
+				next = current <= 0 ? buttons.length - 1 : current - 1;
+				break;
+			case 'ArrowRight':
+			case 'ArrowDown':
+				next = current >= buttons.length - 1 ? 0 : current + 1;
+				break;
+			case 'Home':
+				next = 0;
+				break;
+			case 'End':
+				next = buttons.length - 1;
+				break;
+			default: {
+				const exhaustive: never = key;
+				return exhaustive;
+			}
+		}
+
+		const nextButton = buttons[next];
+		if (!nextButton) return;
+
+		event.preventDefault();
+		applyPreference(optionFromButton(nextButton));
+		nextButton.focus();
+	}
+
+	let themeController: AbortController | undefined;
+
+	function prepareThemeToggle() {
+		themeController?.abort();
+		const controller = new AbortController();
+		themeController = controller;
+		applyPreference(currentPreference());
+		document.querySelectorAll<HTMLButtonElement>('[data-theme-option]').forEach(button => {
+			button.addEventListener('click', () => applyPreference(optionFromButton(button)), { signal: controller.signal });
+		});
+		document.querySelectorAll('.theme-toggle').forEach(group => {
+			group.addEventListener('keydown', event => moveSelection(event as KeyboardEvent), { signal: controller.signal });
+		});
+	}
+
+	document.addEventListener('astro:page-load', prepareThemeToggle);
+	document.addEventListener('astro:before-swap', event => {
+		themeController?.abort();
+		const preference = currentPreference();
+		const theme = resolveTheme(preference);
+		event.newDocument.documentElement.dataset.theme = theme;
+		event.newDocument.documentElement.dataset.themePreference = preference;
+		event.newDocument.documentElement.style.colorScheme = theme;
+		event.newDocument.querySelector('meta[name="theme-color"]')?.setAttribute(
+			'content',
+			theme === 'light' ? LIGHT_THEME_COLOR : DARK_THEME_COLOR,
+		);
+	});
+	window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+		if (currentPreference() === 'system') applyPreference('system');
+	});
+</script>
+
+<style>
+	.theme-toggle {
+		display: inline-flex;
+		gap: 0.1rem;
+		padding: 0.12rem;
+		border: 1px solid var(--hairline-soft);
+		border-radius: var(--button-radius);
+		background: transparent;
+	}
+
+	.theme-toggle button {
+		min-height: 1.7rem;
+		padding: 0.2rem 0.62rem;
+		border: 0;
+		border-radius: calc(var(--button-radius) - 0.08rem);
+		color: var(--footer-meta);
+		background: transparent;
+		font: 400 0.72rem / 1.2 var(--font-body);
+		letter-spacing: 0.02em;
+		cursor: pointer;
+	}
+
+	.theme-toggle button:hover,
+	.theme-toggle button:focus-visible {
+		color: var(--footer-text);
+	}
+
+	.theme-toggle button[aria-checked='true'] {
+		color: var(--footer-text);
+		background: var(--card-background);
+	}
+
+	.theme-toggle button:focus-visible {
+		outline: 2px solid var(--focus-color);
+		outline-offset: 2px;
+	}
+</style>
