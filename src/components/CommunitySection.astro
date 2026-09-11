@@ -75,32 +75,79 @@ const communities = [
 			'The Kuala Lumpur community for people building with Cursor. Join local hackathons, workshops, and conversations with other product-minded makers.',
 	},
 ];
+
+const startIndex = 0;
 ---
 
 <section class="community-chapter light-nav-zone" id="communities" aria-labelledby="community-title">
 	<div class="community-shell">
-		<header class="community-intro">
+		<div class="community-copy">
 			<div class="community-heading">
 				<h2 id="community-title">Malaysia's AI<br /> Communities and Events.</h2>
 			</div>
-			<div class="community-copy">
-				<p class="community-lede">
-					A growing map of AI communities across Malaysia — meetups, builder groups, student
-					chapters, and everyone in between. Join an event, find your people, or add your
-					community to the list. Many gatherings are free and very welcoming.
-				</p>
-				<div class="community-actions">
-					<a class="site-button" href={LUMA_URL}>View upcoming events</a>
-					<a href={ADD_COMMUNITY_HREF}>Add your community</a>
-				</div>
+			<p class="community-lede">
+				A growing map of AI communities across Malaysia — meetups, builder groups, student
+				chapters, and everyone in between. Join an event, find your people, or add your
+				community to the list. Many gatherings are free and very welcoming.
+			</p>
+			<div class="community-actions">
+				<a class="site-button" href={LUMA_URL}>View upcoming events</a>
+				<a href={ADD_COMMUNITY_HREF}>Add your community</a>
 			</div>
-		</header>
+		</div>
+
+		<div
+			class="community-stage"
+			id="community-stage"
+			tabindex="0"
+			aria-label="Interactive community filmstrip"
+		>
+			<p class="sr-only">Select a logo or use the arrow keys to browse the communities.</p>
+			<div class="community-deck" id="community-deck" data-community-deck>
+				{
+					communities.map((community, index) => (
+						<button
+							class:list={['community-card', community.logoClass]}
+							type="button"
+							data-community-card
+							data-index={String(index)}
+							data-name={community.name}
+							data-label={community.label}
+							data-description={community.description}
+							aria-label={`Focus ${community.name}, ${community.label}`}
+							aria-current={index === startIndex ? 'true' : 'false'}
+						>
+							<span class="community-portrait">
+								<img
+									src={community.logo}
+									alt=""
+									width="220"
+									height="140"
+									loading="lazy"
+									decoding="async"
+								/>
+							</span>
+						</button>
+					))
+				}
+			</div>
+		</div>
+
+		<div class="community-focus" aria-live="polite" aria-atomic="true">
+			<div class="community-focus-title">
+				<p class="community-focus-kicker">
+					<span data-community-label>{communities[startIndex].label}</span>
+				</p>
+				<h3 data-community-name>{communities[startIndex].name}</h3>
+			</div>
+			<p data-community-description>{communities[startIndex].description}</p>
+		</div>
 
 		<ul class="community-grid">
 			{
 				communities.map((community) => (
 					<li>
-						<article class="community-card">
+						<article class="community-room">
 							<figure class:list={['community-mark', community.logoClass]}>
 								<img
 									src={community.logo}
@@ -132,46 +179,249 @@ const communities = [
 	</div>
 </section>
 
+<script>
+	let cleanUpCommunity = () => {};
+
+	function prepareCommunitySection() {
+		const desktopQuery = matchMedia('(min-width: 701px)');
+		const stage = document.querySelector<HTMLElement>('#community-stage');
+		const deck = document.querySelector<HTMLElement>('[data-community-deck]');
+		const cards = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-community-card]'));
+		const focusLabel = document.querySelector<HTMLElement>('[data-community-label]');
+		const focusName = document.querySelector<HTMLElement>('[data-community-name]');
+		const focusDescription = document.querySelector<HTMLElement>('[data-community-description]');
+
+		const onBreakpoint = () => prepareCommunity();
+		desktopQuery.addEventListener('change', onBreakpoint);
+
+		if (!desktopQuery.matches || !stage || !deck || !cards.length) {
+			return () => desktopQuery.removeEventListener('change', onBreakpoint);
+		}
+
+		const count = cards.length;
+		const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+		const idleMs = 2400;
+		const stepMs = 2600;
+		let reducedMotion = motionPreference.matches;
+		let sectionIsVisible = false;
+		const startIndex = 0;
+		const state = {
+			phase: startIndex,
+			target: startIndex,
+			base: startIndex,
+			hovering: false,
+			lastInput: performance.now(),
+		};
+		let lastActiveIndex = startIndex;
+
+		function wrappedDelta(index: number, phase: number) {
+			let delta = index - phase;
+			while (delta > count / 2) delta -= count;
+			while (delta < -count / 2) delta += count;
+			return delta;
+		}
+
+		function nearestIndex() {
+			return ((Math.round(state.phase) % count) + count) % count;
+		}
+
+		function moveTo(index: number) {
+			const current = nearestIndex();
+			let delta = index - current;
+			if (delta > count / 2) delta -= count;
+			if (delta < -count / 2) delta += count;
+			state.base = Math.round(state.phase) + delta;
+			state.target = state.base;
+			state.lastInput = performance.now();
+			updateFocus(index);
+			lastActiveIndex = index;
+			scheduleRender();
+		}
+
+		function updateFocus(index: number) {
+			const card = cards[index];
+			if (!card) return;
+			if (focusLabel) focusLabel.textContent = card.dataset.label ?? '';
+			if (focusName) focusName.textContent = card.dataset.name ?? '';
+			if (focusDescription) focusDescription.textContent = card.dataset.description ?? '';
+		}
+
+		cards.forEach((card, index) => {
+			card.addEventListener('click', () => moveTo(index));
+			card.addEventListener('focus', () => moveTo(index));
+			card.addEventListener('pointerenter', () => {
+				if (state.hovering) return;
+				state.hovering = true;
+				state.base = state.phase;
+				state.target = state.phase;
+			});
+			card.addEventListener('pointerleave', () => {
+				if (!state.hovering) return;
+				state.hovering = false;
+				state.base = state.phase;
+				state.target = state.phase;
+				state.lastInput = performance.now();
+			});
+		});
+
+		function handleKeydown(event: KeyboardEvent) {
+			const target = event.target;
+			const inSection =
+				target instanceof Node &&
+				(stage.contains(target) || document.getElementById('communities')?.contains(target));
+			if (!inSection) return;
+
+			const forward = event.key === 'ArrowRight' || event.key === 'ArrowDown';
+			const backward = event.key === 'ArrowLeft' || event.key === 'ArrowUp';
+			if (!forward && !backward) return;
+			event.preventDefault();
+			state.base += forward ? 1 : -1;
+			state.target = state.base;
+			state.lastInput = performance.now();
+			scheduleRender();
+		}
+
+		window.addEventListener('keydown', handleKeydown);
+
+		let previousTime = performance.now();
+		let frame = 0;
+
+		function render(time: number) {
+			frame = 0;
+			const deltaTime = Math.min(32, time - previousTime);
+			previousTime = time;
+			const ease = reducedMotion ? 1 : 1 - Math.pow(0.001, deltaTime / 1000);
+			const keyboardFocus = stage.contains(document.activeElement);
+
+			if (!reducedMotion && !state.hovering && !keyboardFocus && time - state.lastInput > idleMs) {
+				const elapsed = time - state.lastInput - idleMs;
+				state.target = state.base + 1 + Math.floor(elapsed / stepMs);
+			}
+
+			state.phase += (state.target - state.phase) * ease;
+			const activeIndex = nearestIndex();
+			const horizontalSpacing = Math.min(138, Math.max(82, innerWidth * 0.095));
+
+			if (activeIndex !== lastActiveIndex) {
+				lastActiveIndex = activeIndex;
+				updateFocus(activeIndex);
+			}
+
+			cards.forEach((card, index) => {
+				const delta = wrappedDelta(index, state.phase);
+				const distance = Math.abs(delta);
+				const focus = Math.exp(-distance * distance * 1.28);
+				const side = Math.max(0, 1 - distance / 5);
+				const direction = Math.sign(delta) || 0;
+				const x = delta * horizontalSpacing;
+				const y = distance * 6;
+				const z = focus * 145 - distance * 148;
+				const scale = 0.54 + side * 0.15 + focus * 0.54;
+				const rotateY = -direction * (distance > 0.2 ? 9 + Math.min(distance, 3) * 3 : 0);
+
+				card.style.setProperty('--focus', focus.toFixed(4));
+				card.style.zIndex = String(Math.round(1000 - distance * 100));
+				card.style.opacity = String(Math.max(0.42, side * 0.66 + focus * 0.34));
+				card.style.filter = 'none';
+				card.style.transform = [
+					'translate(-50%, -50%)',
+					`translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px)`,
+					`rotateY(${rotateY.toFixed(2)}deg)`,
+					`rotateZ(${(delta * 0.7).toFixed(2)}deg)`,
+					`scale(${scale.toFixed(4)})`,
+				].join(' ');
+				card.setAttribute('aria-current', index === activeIndex ? 'true' : 'false');
+			});
+
+			if (!reducedMotion) scheduleRender();
+		}
+
+		function scheduleRender() {
+			if (!frame && sectionIsVisible && !document.hidden) frame = requestAnimationFrame(render);
+		}
+
+		function updateVisibility() {
+			cancelAnimationFrame(frame);
+			frame = 0;
+			previousTime = performance.now();
+			state.lastInput = previousTime;
+			scheduleRender();
+		}
+
+		function updateMotionPreference() {
+			reducedMotion = motionPreference.matches;
+			updateVisibility();
+		}
+
+		const observer = new IntersectionObserver(([entry]) => {
+			sectionIsVisible = entry.isIntersecting;
+			updateVisibility();
+		});
+		observer.observe(stage);
+		document.addEventListener('visibilitychange', updateVisibility);
+		window.addEventListener('resize', scheduleRender);
+		motionPreference.addEventListener('change', updateMotionPreference);
+
+		return () => {
+			cancelAnimationFrame(frame);
+			observer.disconnect();
+			document.removeEventListener('visibilitychange', updateVisibility);
+			window.removeEventListener('resize', scheduleRender);
+			motionPreference.removeEventListener('change', updateMotionPreference);
+			window.removeEventListener('keydown', handleKeydown);
+			desktopQuery.removeEventListener('change', onBreakpoint);
+		};
+	}
+
+	function prepareCommunity() {
+		cleanUpCommunity();
+		cleanUpCommunity = prepareCommunitySection();
+	}
+
+	document.addEventListener('astro:page-load', prepareCommunity);
+	document.addEventListener('astro:before-swap', () => cleanUpCommunity());
+</script>
+
 <style>
 	.community-chapter {
+		display: grid;
+		min-height: 100dvh;
 		padding: clamp(4rem, 7vw, 6rem) clamp(1.5rem, 4vw, 4rem);
+		align-items: center;
 		color: var(--text-bright);
 		background: var(--page-background);
 	}
 
 	.community-shell {
 		display: grid;
-		gap: clamp(2.25rem, 4vw, 3.5rem);
+		gap: clamp(1.75rem, 3vw, 2.75rem);
 		width: min(92rem, 100%);
 		margin: 0 auto;
 	}
 
-	.community-intro {
-		display: grid;
-		grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
-		gap: clamp(1.5rem, 4vw, 4rem);
-		align-items: end;
+	.community-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		align-items: center;
+		width: min(42rem, 100%);
+		margin: 0 auto;
+		text-align: center;
 	}
 
-	.community-heading h2 {
+	.community-copy h2 {
 		margin: 0;
 		font-family: var(--font-display);
-		font-size: clamp(2.3rem, 3.8vw, 3.6rem);
+		font-size: clamp(2.2rem, 3.6vw, 3.4rem);
 		font-weight: 400;
 		letter-spacing: -0.035em;
 		line-height: 0.9;
 		text-wrap: balance;
 	}
 
-	.community-copy {
-		display: grid;
-		gap: 1.15rem;
-		justify-items: start;
-	}
-
 	.community-lede {
-		max-width: 28rem;
-		margin: 0;
+		max-width: 36rem;
+		margin: 0 auto;
 		color: rgb(224 232 244 / 0.72);
 		font-size: clamp(0.92rem, 1.25vw, 1.08rem);
 		line-height: var(--leading-body);
@@ -182,6 +432,7 @@ const communities = [
 		flex-wrap: wrap;
 		gap: 0.75rem 1.1rem;
 		align-items: center;
+		justify-content: center;
 	}
 
 	.community-actions a:not(.site-button),
@@ -196,101 +447,131 @@ const communities = [
 		outline-offset: 4px;
 	}
 
-	.community-grid {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 1rem;
-		margin: 0;
-		padding: 0;
-		list-style: none;
-		counter-reset: room;
+	.community-stage {
+		position: relative;
+		width: 100%;
+		height: clamp(20rem, 34dvh, 27rem);
+		overflow: hidden;
+		isolation: isolate;
+		perspective: 1450px;
+		cursor: default;
+		touch-action: pan-y;
 	}
 
-	.community-grid > li {
-		min-width: 0;
+	.community-stage:focus-visible {
+		outline: none;
+	}
+
+	.community-deck {
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		transform-style: preserve-3d;
 	}
 
 	.community-card {
-		display: grid;
-		counter-increment: room;
-		height: 100%;
+		--focus: 0;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: clamp(128px, 13vw, 188px);
+		aspect-ratio: 1.08;
+		padding: 0;
 		overflow: hidden;
-		border: 1.5px solid rgb(115 152 207 / 0.55);
-		border-radius: 0.95rem;
-		background: #0a111c;
-		transition: border-color 180ms ease, transform 180ms ease;
+		border: 0;
+		border-radius: var(--radius-media);
+		color: #0d1622;
+		background: transparent;
+		box-shadow:
+			0 calc(8px + var(--focus) * 16px) calc(18px + var(--focus) * 28px)
+			rgb(0 0 0 / calc(0.2 + var(--focus) * 0.22));
+		appearance: none;
+		outline: none;
+		transform-style: preserve-3d;
+		will-change: transform, opacity;
+		cursor: pointer;
 	}
 
-	@media (hover: hover) {
-		.community-card:hover {
-			border-color: rgb(169 199 239 / 0.9);
-			transform: translateY(-2px);
-		}
+	.community-card:focus-visible {
+		box-shadow: 0 24px 48px rgb(0 0 0 / 0.48), 0 0 0 3px rgb(151 184 231 / 0.35);
 	}
 
-	.community-mark {
-		position: relative;
+	.community-portrait {
+		position: absolute;
+		inset: 0;
 		display: grid;
-		margin: 0;
-		aspect-ratio: 1.35;
 		place-items: center;
+		overflow: hidden;
+		border-radius: var(--radius-media);
 		background:
 			radial-gradient(circle at 50% 40%, rgb(255 255 255 / 0.9), transparent 62%),
 			#e9edf3;
 	}
 
-	.community-mark::after {
-		position: absolute;
-		right: 0.7rem;
-		bottom: 0.55rem;
-		color: rgb(13 22 34 / 0.38);
-		content: counter(room, decimal-leading-zero);
-		font-size: 0.68rem;
-		font-weight: 700;
-		letter-spacing: 0.08em;
-	}
-
-	.community-mark img {
+	.community-portrait img {
 		display: block;
-		width: 52%;
-		height: 52%;
+		width: 76%;
+		height: 76%;
 		object-fit: contain;
+		transform: scale(calc(1.02 + (1 - var(--focus)) * 0.04));
+		filter: saturate(calc(0.72 + var(--focus) * 0.28)) contrast(1.04);
 	}
 
-	.community-mark.is-wide img {
-		width: 74%;
+	.community-card.is-wide .community-portrait img {
+		width: 86%;
 	}
 
-	.community-body {
-		display: grid;
-		gap: 0.55rem;
-		align-content: start;
-		min-width: 0;
-		padding: 1.15rem 1.2rem 1.3rem;
+	.community-focus {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 0.8rem;
+		align-items: center;
+		width: min(48rem, 100%);
+		margin: 0 auto;
+		padding: clamp(1.5rem, 2.5vw, 2rem) clamp(1.5rem, 4vw, 3.25rem);
+		border-radius: 1.15rem;
+		background: #0a1019;
+		box-shadow: 0 20px 55px rgb(0 0 0 / 0.22);
+		text-align: center;
 	}
 
-	.community-label {
-		margin: 0;
+	.community-focus-kicker {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.55rem 0.8rem;
+		align-items: center;
+		justify-content: center;
+		margin: 0 0 0.4rem;
 		color: var(--text-accent);
 		font-size: 0.66rem;
+		font-weight: 400;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
 	}
 
-	.community-body h3 {
+	.community-focus h3 {
 		margin: 0;
 		font-family: var(--font-display);
-		font-size: clamp(1.45rem, 1.8vw, 1.75rem);
+		font-size: clamp(1.8rem, 2.8vw, 2.65rem);
 		font-weight: 400;
-		letter-spacing: -0.03em;
-		line-height: 1;
+		letter-spacing: -0.035em;
+		line-height: 0.95;
 	}
 
-	.community-body p:last-child {
-		margin: 0;
+	.community-focus > p:last-child {
+		max-width: 38rem;
+		margin: 0 auto;
 		color: rgb(224 232 244 / 0.68);
-		font-size: 0.92rem;
+		font-size: clamp(0.9rem, 1.15vw, 1.02rem);
 		line-height: var(--leading-body);
+	}
+
+	.community-grid {
+		display: none;
+		margin: 0;
+		padding: 0;
+		list-style: none;
 	}
 
 	.community-invite {
@@ -309,14 +590,21 @@ const communities = [
 		line-height: var(--leading-body);
 	}
 
-	@media (max-width: 960px) {
-		.community-grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	@media (max-width: 700px) {
 		.community-chapter {
+			min-height: auto;
 			padding: 3rem 0.65rem;
 		}
 
@@ -324,71 +612,104 @@ const communities = [
 			gap: 1.75rem;
 		}
 
-		.community-intro {
-			grid-template-columns: 1fr;
-			gap: 1.15rem;
+		.community-copy {
 			align-items: start;
+			width: 100%;
+			text-align: left;
 		}
 
-		.community-heading h2 {
+		.community-copy h2 {
 			font-size: clamp(2.3rem, 10vw, 3.25rem);
 		}
 
 		.community-lede {
 			max-width: none;
+			margin: 0;
+		}
+
+		.community-actions {
+			justify-content: start;
+		}
+
+		.community-stage,
+		.community-focus {
+			display: none;
 		}
 
 		.community-grid {
+			display: grid;
 			grid-template-columns: 1fr;
 			gap: 0.75rem;
 		}
 
-		.community-card {
+		.community-room {
+			display: grid;
 			grid-template-columns: 6.5rem minmax(0, 1fr);
 			align-items: stretch;
+			overflow: hidden;
+			border: 1.5px solid rgb(115 152 207 / 0.55);
+			border-radius: 0.95rem;
+			background: #0a111c;
 		}
 
 		.community-mark {
-			aspect-ratio: auto;
+			position: relative;
+			display: grid;
+			margin: 0;
 			min-height: 6.5rem;
+			place-items: center;
+			background:
+				radial-gradient(circle at 50% 40%, rgb(255 255 255 / 0.9), transparent 62%),
+				#e9edf3;
 		}
 
 		.community-mark img {
+			display: block;
 			width: 64%;
 			height: 64%;
+			object-fit: contain;
 		}
 
 		.community-mark.is-wide img {
 			width: 78%;
 		}
 
-		.community-mark::after {
-			right: 0.4rem;
-			bottom: 0.4rem;
-			font-size: 0.58rem;
-		}
-
 		.community-body {
+			display: grid;
 			gap: 0.4rem;
+			align-content: start;
+			min-width: 0;
 			padding: 0.9rem 0.95rem 1rem 0.85rem;
 		}
 
+		.community-label {
+			margin: 0;
+			color: var(--text-accent);
+			font-size: 0.66rem;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+		}
+
 		.community-body h3 {
+			margin: 0;
+			font-family: var(--font-display);
 			font-size: 1.35rem;
+			font-weight: 400;
+			letter-spacing: -0.03em;
+			line-height: 1;
 		}
 
 		.community-body p:last-child {
+			margin: 0;
+			color: rgb(224 232 244 / 0.68);
 			font-size: 0.86rem;
+			line-height: var(--leading-body);
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.community-card {
-			transition: none;
-		}
-
-		.community-card:hover {
-			transform: none;
+			will-change: auto;
 		}
 	}
 </style>
