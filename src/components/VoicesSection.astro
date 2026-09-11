@@ -160,7 +160,7 @@ import { voices } from '../data/voices';
 	.voices-hint {
 		max-width: 24rem;
 		margin: 1.4rem 0 0;
-		color: rgb(224 232 244 / 0.55);
+		color: var(--text-softer);
 		font-size: 0.88rem;
 		line-height: 1.55;
 	}
@@ -173,7 +173,7 @@ import { voices } from '../data/voices';
 	}
 
 	.voices-deck:focus-visible {
-		outline: 2px solid #9bbbe7;
+		outline: 2px solid var(--focus-color);
 		outline-offset: 6px;
 		border-radius: 0.95rem;
 	}
@@ -183,9 +183,9 @@ import { voices } from '../data/voices';
 		align-self: start;
 		min-height: 13rem;
 		padding: clamp(1.35rem, 2vw, 1.75rem);
-		border: 1.5px solid rgb(115 152 207 / 0.55);
+		border: 1.5px solid var(--hairline);
 		border-radius: 0.95rem;
-		background: #0a111c;
+		background: var(--card-raised);
 		transition: transform 480ms cubic-bezier(0.3, 0.8, 0.3, 1), opacity 420ms ease;
 	}
 
@@ -253,7 +253,7 @@ import { voices } from '../data/voices';
 	}
 
 	.voice-context {
-		color: rgb(224 232 244 / 0.5);
+		color: var(--text-faint);
 		font-size: 0.76rem;
 	}
 
@@ -263,7 +263,7 @@ import { voices } from '../data/voices';
 
 	.voice-card blockquote p {
 		margin: 0;
-		color: var(--color-white);
+		color: var(--quote-text);
 		font-size: clamp(0.95rem, 1.15vw, 1.08rem);
 		line-height: var(--leading-body);
 	}
