@@ -197,6 +197,17 @@ test('mobile navigation closes on Escape and after selecting a destination', asy
 	await expect(menu).not.toHaveAttribute('open', '');
 });
 
+test('homepage brand mark is visible on mobile', async ({ page, isMobile }) => {
+	test.skip(!isMobile, 'Mobile logo layout only');
+	await page.goto('/');
+	const mark = page.locator('.hero-header .brand-mark img');
+	await expect(mark).toBeVisible();
+	expect(await mark.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+	const box = await mark.boundingBox();
+	expect(box?.width).toBeGreaterThan(24);
+	expect(box?.height).toBeGreaterThan(24);
+});
+
 test('theme toggle follows the system scheme and can lock light or dark', async ({ page }) => {
 	await page.emulateMedia({ colorScheme: 'dark' });
 	await page.goto('/');
