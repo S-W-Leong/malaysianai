@@ -60,7 +60,6 @@
 		@keyframes breathe { 50% { transform: scale(1.09); } }
 		@media (prefers-reduced-motion: reduce) {
 			.spark, .bloom { animation: none; }
-			.trace { stroke-dashoffset: 0; }
 		}
 	</style>
 
