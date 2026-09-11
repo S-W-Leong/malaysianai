@@ -112,14 +112,17 @@ test('known retired routes retain redirect fallbacks and AIMTO has a host wildca
 	expect(hosting.trailingSlash).toBe(false);
 });
 
-test('favicons paint immediately without waiting for an animation', async ({ page }) => {
+test('site marks paint immediately without waiting for an animation', async ({ page }) => {
 	await page.emulateMedia({ reducedMotion: 'no-preference' });
 	await page.goto('/');
 	const icons = await page.locator('link[rel="icon"]').evaluateAll(links => links.map(link => link.getAttribute('href')!));
 	expect(icons).toHaveLength(2);
+	const brand = await page.locator('.brand-mark img').getAttribute('src');
+	expect(brand).toBeTruthy();
+	const marks = [...icons, brand!];
 	// Decode a fresh image URL to check the first frame, not a warmed animation.
 	await page.goto('/robots.txt');
-	for (const src of icons) {
+	for (const src of marks) {
 		const visiblePixels = await page.evaluate(async src => {
 			const image = document.createElement('img');
 			const url = new URL(src, window.location.href);

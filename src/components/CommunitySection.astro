@@ -5,7 +5,6 @@ const communities = [
 	{
 		name: 'Build Club',
 		logo: '/build-club-logo-navbar.webp',
-		group: 'build',
 		logoClass: 'is-wide',
 		label: 'Learn by building',
 		description:
@@ -14,7 +13,6 @@ const communities = [
 	{
 		name: 'Build with AI',
 		logo: '/build_with_ai_logo.jpeg',
-		group: 'learn',
 		logoClass: 'is-square',
 		label: 'Open builder meetups',
 		description:
@@ -23,7 +21,6 @@ const communities = [
 	{
 		name: 'AI Tinkerers',
 		logo: '/ai_tinkerers_logo.png',
-		group: 'meet',
 		logoClass: 'is-wide',
 		label: 'Technical deep dives',
 		description:
@@ -32,7 +29,6 @@ const communities = [
 	{
 		name: 'AI Hackerdorm',
 		logo: '/ai_hackerdorm.webp',
-		group: 'build',
 		logoClass: 'is-square',
 		label: 'Student-first builds',
 		description:
@@ -41,7 +37,6 @@ const communities = [
 	{
 		name: 'AI SEA',
 		logo: '/aisea_logo.png',
-		group: 'learn',
 		logoClass: 'is-square',
 		label: 'Southeast Asian network',
 		description:
@@ -50,7 +45,6 @@ const communities = [
 	{
 		name: 'KrackedDevs',
 		logo: '/krackeddevs-logo.png',
-		group: 'build',
 		logoClass: 'is-square',
 		label: 'Grassroots builder guilds',
 		description:
@@ -59,7 +53,6 @@ const communities = [
 	{
 		name: 'Rakan Tutor',
 		logo: '/rakan-tutor-logo.png',
-		group: 'learn',
 		logoClass: 'is-wide',
 		label: 'AI education for all',
 		description:
@@ -68,7 +61,6 @@ const communities = [
 	{
 		name: 'CoderPuffs',
 		logo: '/coderpuffs_logo.png',
-		group: 'meet',
 		logoClass: 'is-square',
 		label: 'Women-first community',
 		description:
@@ -77,7 +69,6 @@ const communities = [
 	{
 		name: 'Cursor KL',
 		logo: '/cursor-community-logo.png',
-		group: 'build',
 		logoClass: 'is-square',
 		label: 'Cursor builders in KL',
 		description:
@@ -129,7 +120,7 @@ const startIndex = 0;
 							<span class="community-portrait">
 								<img
 									src={community.logo}
-									alt={community.name}
+									alt=""
 									width="220"
 									height="140"
 									loading="lazy"
@@ -152,13 +143,31 @@ const startIndex = 0;
 			<p data-community-description>{communities[startIndex].description}</p>
 		</div>
 
-		<div class="community-invite">
-			<p>
-				Run a community that isn't listed yet? We're building this as a shared directory for
-				Malaysia's AI scene — filled in by the people who organise it.
-			</p>
-			<a href={ADD_COMMUNITY_HREF}>Submit a community <span aria-hidden="true">↗</span></a>
-		</div>
+		<ul class="community-grid">
+			{
+				communities.map((community) => (
+					<li>
+						<article class="community-room">
+							<figure class:list={['community-mark', community.logoClass]}>
+								<img
+									src={community.logo}
+									alt=""
+									width="220"
+									height="140"
+									loading="lazy"
+									decoding="async"
+								/>
+							</figure>
+							<div class="community-body">
+								<p class="community-label">{community.label}</p>
+								<h3>{community.name}</h3>
+								<p>{community.description}</p>
+							</div>
+						</article>
+					</li>
+				))
+			}
+		</ul>
 	</div>
 </section>
 
@@ -166,6 +175,7 @@ const startIndex = 0;
 	let cleanUpCommunity = () => {};
 
 	function prepareCommunitySection() {
+		const desktopQuery = matchMedia('(min-width: 701px)');
 		const stage = document.querySelector<HTMLElement>('#community-stage');
 		const deck = document.querySelector<HTMLElement>('[data-community-deck]');
 		const cards = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-community-card]'));
@@ -173,10 +183,17 @@ const startIndex = 0;
 		const focusName = document.querySelector<HTMLElement>('[data-community-name]');
 		const focusDescription = document.querySelector<HTMLElement>('[data-community-description]');
 
-		if (!stage || !deck || !cards.length) return () => {};
+		const onBreakpoint = () => prepareCommunity();
+		desktopQuery.addEventListener('change', onBreakpoint);
+
+		if (!desktopQuery.matches || !stage || !deck || !cards.length) {
+			return () => desktopQuery.removeEventListener('change', onBreakpoint);
+		}
 
 		const count = cards.length;
 		const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+		const idleMs = 2400;
+		const stepMs = 2600;
 		let reducedMotion = motionPreference.matches;
 		let sectionIsVisible = false;
 		const startIndex = 0;
@@ -185,7 +202,6 @@ const startIndex = 0;
 			target: startIndex,
 			base: startIndex,
 			hovering: false,
-			hoverStartedAt: 0,
 			lastInput: performance.now(),
 		};
 		let lastActiveIndex = startIndex;
@@ -228,14 +244,15 @@ const startIndex = 0;
 			card.addEventListener('pointerenter', () => {
 				if (state.hovering) return;
 				state.hovering = true;
-				state.hoverStartedAt = performance.now();
+				state.base = state.phase;
 				state.target = state.phase;
 			});
 			card.addEventListener('pointerleave', () => {
 				if (!state.hovering) return;
-				const now = performance.now();
-				state.lastInput += now - state.hoverStartedAt;
 				state.hovering = false;
+				state.base = state.phase;
+				state.target = state.phase;
+				state.lastInput = performance.now();
 			});
 		});
 
@@ -243,7 +260,7 @@ const startIndex = 0;
 			const target = event.target;
 			const inSection =
 				target instanceof Node &&
-				(stage?.contains(target) || document.getElementById('communities')?.contains(target));
+				(stage.contains(target) || document.getElementById('communities')?.contains(target));
 			if (!inSection) return;
 
 			const forward = event.key === 'ArrowRight' || event.key === 'ArrowDown';
@@ -266,19 +283,16 @@ const startIndex = 0;
 			const deltaTime = Math.min(32, time - previousTime);
 			previousTime = time;
 			const ease = reducedMotion ? 1 : 1 - Math.pow(0.001, deltaTime / 1000);
+			const keyboardFocus = stage.contains(document.activeElement);
 
-			if (!reducedMotion && !state.hovering && !stage?.contains(document.activeElement) && time - state.lastInput > 2800) {
-				const elapsed = time - state.lastInput - 2800;
-				const cycle = (elapsed / 10500) % 2;
-				const sweep = cycle <= 1 ? cycle : 2 - cycle;
-				state.target = sweep * (count - 1);
+			if (!reducedMotion && !state.hovering && !keyboardFocus && time - state.lastInput > idleMs) {
+				const elapsed = time - state.lastInput - idleMs;
+				state.target = state.base + 1 + Math.floor(elapsed / stepMs);
 			}
 
 			state.phase += (state.target - state.phase) * ease;
-			const compact = innerWidth < 650;
 			const activeIndex = nearestIndex();
 			const horizontalSpacing = Math.min(138, Math.max(82, innerWidth * 0.095));
-			const verticalSpacing = Math.min(112, Math.max(78, innerHeight * 0.1));
 
 			if (activeIndex !== lastActiveIndex) {
 				lastActiveIndex = activeIndex;
@@ -291,19 +305,11 @@ const startIndex = 0;
 				const focus = Math.exp(-distance * distance * 1.28);
 				const side = Math.max(0, 1 - distance / 5);
 				const direction = Math.sign(delta) || 0;
-				const x = compact
-					? delta * 24 + Math.sin(delta * 0.9) * 25
-					: delta * horizontalSpacing;
-				const y = compact
-					? delta * verticalSpacing
-					: distance * 6;
+				const x = delta * horizontalSpacing;
+				const y = distance * 6;
 				const z = focus * 145 - distance * 148;
 				const scale = 0.54 + side * 0.15 + focus * 0.54;
-				const rotateX = compact ? delta * 1.5 : 0;
-				const rotateY = compact
-					? -delta * 3.5
-					: -direction * (distance > 0.2 ? 9 + Math.min(distance, 3) * 3 : 0);
-				const rotateZ = compact ? delta * -1.4 : delta * 0.7;
+				const rotateY = -direction * (distance > 0.2 ? 9 + Math.min(distance, 3) * 3 : 0);
 
 				card.style.setProperty('--focus', focus.toFixed(4));
 				card.style.zIndex = String(Math.round(1000 - distance * 100));
@@ -312,9 +318,8 @@ const startIndex = 0;
 				card.style.transform = [
 					'translate(-50%, -50%)',
 					`translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px)`,
-					`rotateX(${rotateX.toFixed(2)}deg)`,
 					`rotateY(${rotateY.toFixed(2)}deg)`,
-					`rotateZ(${rotateZ.toFixed(2)}deg)`,
+					`rotateZ(${(delta * 0.7).toFixed(2)}deg)`,
 					`scale(${scale.toFixed(4)})`,
 				].join(' ');
 				card.setAttribute('aria-current', index === activeIndex ? 'true' : 'false');
@@ -348,6 +353,7 @@ const startIndex = 0;
 		document.addEventListener('visibilitychange', updateVisibility);
 		window.addEventListener('resize', scheduleRender);
 		motionPreference.addEventListener('change', updateMotionPreference);
+
 		return () => {
 			cancelAnimationFrame(frame);
 			observer.disconnect();
@@ -355,6 +361,7 @@ const startIndex = 0;
 			window.removeEventListener('resize', scheduleRender);
 			motionPreference.removeEventListener('change', updateMotionPreference);
 			window.removeEventListener('keydown', handleKeydown);
+			desktopQuery.removeEventListener('change', onBreakpoint);
 		};
 	}
 
@@ -420,26 +427,14 @@ const startIndex = 0;
 		justify-content: center;
 	}
 
-	.community-actions a:not(.site-button),
-	.community-invite a {
+	.community-actions a:not(.site-button) {
 		color: inherit;
 		text-underline-offset: 0.22em;
 	}
 
-	.community-invite {
-		display: grid;
-		gap: 0.85rem;
-		justify-items: center;
-		width: min(36rem, 100%);
-		margin: 0 auto;
-		text-align: center;
-	}
-
-	.community-invite p {
-		margin: 0;
-		color: var(--text-soft);
-		font-size: clamp(0.9rem, 1.15vw, 1.02rem);
-		line-height: var(--leading-body);
+	.community-actions a:focus-visible {
+		outline: 2px solid var(--focus-color);
+		outline-offset: 4px;
 	}
 
 	.community-stage {
@@ -453,7 +448,9 @@ const startIndex = 0;
 		touch-action: pan-y;
 	}
 
-	.community-stage:focus-visible { outline: none; }
+	.community-stage:focus-visible {
+		outline: none;
+	}
 
 	.community-deck {
 		position: absolute;
@@ -475,12 +472,13 @@ const startIndex = 0;
 		border-radius: var(--radius-media);
 		color: #0d1622;
 		background: transparent;
-		box-shadow: 0 calc(8px + var(--focus) * 16px) calc(18px + var(--focus) * 28px)
+		box-shadow:
+			0 calc(8px + var(--focus) * 16px) calc(18px + var(--focus) * 28px)
 			rgb(0 0 0 / calc(0.2 + var(--focus) * 0.22));
 		appearance: none;
 		outline: none;
 		transform-style: preserve-3d;
-		will-change: transform, opacity, filter;
+		will-change: transform, opacity;
 		cursor: pointer;
 	}
 
@@ -495,7 +493,9 @@ const startIndex = 0;
 		place-items: center;
 		overflow: hidden;
 		border-radius: var(--radius-media);
-		background: radial-gradient(circle at 50% 40%, rgb(255 255 255 / 0.9), transparent 62%), #e9edf3;
+		background:
+			radial-gradient(circle at 50% 40%, rgb(255 255 255 / 0.9), transparent 62%),
+			#e9edf3;
 	}
 
 	.community-portrait img {
@@ -507,7 +507,9 @@ const startIndex = 0;
 		filter: saturate(calc(0.72 + var(--focus) * 0.28)) contrast(1.04);
 	}
 
-	.community-card.is-wide .community-portrait img { width: 86%; }
+	.community-card.is-wide .community-portrait img {
+		width: 86%;
+	}
 
 	.community-focus {
 		position: relative;
@@ -556,6 +558,13 @@ const startIndex = 0;
 		line-height: var(--leading-body);
 	}
 
+	.community-grid {
+		display: none;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
 	.sr-only {
 		position: absolute;
 		width: 1px;
@@ -569,15 +578,114 @@ const startIndex = 0;
 	}
 
 	@media (max-width: 700px) {
-		.community-chapter { min-height: auto; padding: 3rem 1rem; }
-		.community-shell { gap: 1.75rem; }
-		.community-copy h2 { font-size: clamp(2.3rem, 10vw, 3.25rem); }
-		.community-stage { height: clamp(24rem, 55svh, 30rem); }
-		.community-card { width: clamp(116px, 38vw, 154px); }
-		.community-focus { gap: 1rem; padding: 1.4rem 1rem; }
+		.community-chapter {
+			min-height: auto;
+			padding: 3rem 0.65rem;
+		}
+
+		.community-shell {
+			gap: 1.75rem;
+		}
+
+		.community-copy {
+			align-items: start;
+			width: 100%;
+			text-align: left;
+		}
+
+		.community-copy h2 {
+			font-size: clamp(2.3rem, 10vw, 3.25rem);
+		}
+
+		.community-lede {
+			max-width: none;
+			margin: 0;
+		}
+
+		.community-actions {
+			justify-content: start;
+		}
+
+		.community-stage,
+		.community-focus {
+			display: none;
+		}
+
+		.community-grid {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 0.75rem;
+		}
+
+		.community-room {
+			display: grid;
+			grid-template-columns: 6.5rem minmax(0, 1fr);
+			align-items: stretch;
+			overflow: hidden;
+			border: 1.5px solid var(--hairline);
+			border-radius: 0.95rem;
+			background: var(--card-raised);
+		}
+
+		.community-mark {
+			position: relative;
+			display: grid;
+			margin: 0;
+			min-height: 6.5rem;
+			place-items: center;
+			background:
+				radial-gradient(circle at 50% 40%, rgb(255 255 255 / 0.9), transparent 62%),
+				#e9edf3;
+		}
+
+		.community-mark img {
+			display: block;
+			width: 64%;
+			height: auto;
+			max-height: 4.2rem;
+			object-fit: contain;
+		}
+
+		.community-mark.is-wide img {
+			width: 78%;
+		}
+
+		.community-body {
+			display: grid;
+			gap: 0.4rem;
+			align-content: start;
+			min-width: 0;
+			padding: 0.9rem 0.95rem 1rem 0.85rem;
+		}
+
+		.community-label {
+			margin: 0;
+			color: var(--text-accent);
+			font-size: 0.66rem;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+		}
+
+		.community-body h3 {
+			margin: 0;
+			font-family: var(--font-display);
+			font-size: 1.35rem;
+			font-weight: 400;
+			letter-spacing: -0.03em;
+			line-height: 1;
+		}
+
+		.community-body p:last-child {
+			margin: 0;
+			color: var(--text-soft);
+			font-size: 0.86rem;
+			line-height: var(--leading-body);
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.community-card { will-change: auto; }
+		.community-card {
+			will-change: auto;
+		}
 	}
 </style>

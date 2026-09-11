@@ -70,7 +70,20 @@ test('image dialog contains keyboard focus, closes and survives page navigation'
 	expect(errors).toEqual([]);
 });
 
-test('community rendering stops offscreen and reduced motion still allows keyboard selection', async ({ page }) => {
+const communityNames = [
+	'Build Club',
+	'Build with AI',
+	'AI Tinkerers',
+	'AI Hackerdorm',
+	'AI SEA',
+	'KrackedDevs',
+	'Rakan Tutor',
+	'CoderPuffs',
+	'Cursor KL',
+];
+
+test('community filmstrip cycles on desktop and reduced motion still allows keyboard selection', async ({ page, isMobile }) => {
+	test.skip(isMobile, 'Filmstrip is desktop-only');
 	await page.goto('/');
 	const stage = page.locator('#community-stage');
 	await stage.scrollIntoViewIfNeeded();
@@ -99,6 +112,22 @@ test('community rendering stops offscreen and reduced motion still allows keyboa
 	const reducedCount = await mutations();
 	await page.waitForTimeout(300);
 	expect(await mutations()).toBe(reducedCount);
+});
+
+test('community directory lists every partner without overflowing', async ({ page, isMobile }) => {
+	await page.goto('/');
+	const section = page.locator('#communities');
+	await section.scrollIntoViewIfNeeded();
+	if (isMobile) {
+		for (const name of communityNames) {
+			await expect(section.getByRole('heading', { name, exact: true })).toBeVisible();
+		}
+	} else {
+		for (const name of communityNames) {
+			await expect(section.getByRole('button', { name: new RegExp(`Focus ${name}`) })).toBeAttached();
+		}
+	}
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
 });
 
 test('event autoplay advances over the background and resumes after card interaction', async ({ page, isMobile }) => {
@@ -166,6 +195,17 @@ test('mobile navigation closes on Escape and after selecting a destination', asy
 	await menu.getByRole('link', { name: 'Stories' }).click();
 	await expect(page).toHaveURL(/\/blog\/?$/);
 	await expect(menu).not.toHaveAttribute('open', '');
+});
+
+test('homepage brand mark is visible on mobile', async ({ page, isMobile }) => {
+	test.skip(!isMobile, 'Mobile logo layout only');
+	await page.goto('/');
+	const mark = page.locator('.hero-header .brand-mark img');
+	await expect(mark).toBeVisible();
+	expect(await mark.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+	const box = await mark.boundingBox();
+	expect(box?.width).toBeGreaterThan(24);
+	expect(box?.height).toBeGreaterThan(24);
 });
 
 test('theme toggle follows the system scheme and can lock light or dark', async ({ page }) => {

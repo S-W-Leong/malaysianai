@@ -257,6 +257,7 @@ import { LUMA_URL } from '../consts';
 			--hero-gap: 0.6rem;
 			--hero-panel-width: calc(100% - var(--hero-gap));
 			--hero-brand-width: 4.4rem;
+			--hero-logo-width-mobile: 3.2rem;
 			--hero-control-height: 2rem;
 			min-height: max(42rem, 100svh);
 			padding: var(--hero-gap);
@@ -264,11 +265,13 @@ import { LUMA_URL } from '../consts';
 
 		.hero-media {
 			inset: var(--hero-gap);
-			border-radius: 0.75rem;
+			border-left: 0;
+			border-bottom: 0;
+			border-radius: 0.75rem 0.75rem 0 0;
 		}
 
 		.hero-art {
-			object-position: 51% center;
+			object-position: 61.8% 38.2%;
 		}
 
 		.sky-wordmark {
@@ -287,6 +290,7 @@ import { LUMA_URL } from '../consts';
 		}
 
 		.hero-card::after {
+			left: 0;
 			border-top-right-radius: 0.85rem;
 		}
 
