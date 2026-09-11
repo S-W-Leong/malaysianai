@@ -1,8 +1,13 @@
 export const SITE_TITLE = 'Malaysian AI';
 export const SITE_DESCRIPTION =
-	'The home of AI builders in Malaysia. Join workshops, events, and a community of people figuring out AI together.';
+	"Discover Malaysia's AI communities and events — meetups, builder groups, and workshops across the country.";
 
 export const LUMA_URL = 'https://luma.com/malaysianai';
+export const ADD_COMMUNITY_HREF =
+	'/contact?subject=' + encodeURIComponent('Add my community to the directory');
+export const ADD_COMMUNITY_WHATSAPP =
+	'https://wa.me/60109847954?text=' +
+	encodeURIComponent("Hi, I'd like to add my community to the directory.");
 export const APPLY_FORM_URL = 'https://airtable.com/appBgmnpu1bJljnxX/pagEZn6n60tDty3lP';
 export const APPLY_EMBED_URL = 'https://airtable.com/embed/appBgmnpu1bJljnxX/pagEZn6n60tDty3lP';
 export const SHOW_AND_TELL_WHATSAPP =

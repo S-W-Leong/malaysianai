@@ -9,7 +9,7 @@ if (!Astro.site) throw new Error('Configure the production site URL in astro.con
 const site = Astro.site;
 const canonical = canonicalURL(Astro.url.pathname, site);
 const pageTitle = title === SITE_TITLE
-	? `${SITE_TITLE} | The home of AI builders in Malaysia`
+	? `${SITE_TITLE} | Learn, build and experience Malaysian AI`
 	: title.endsWith(` | ${SITE_TITLE}`) ? title : `${title} | ${SITE_TITLE}`;
 const imageURL = new URL(image.src, site).href;
 const organizationId = new URL('#organization', site).href;

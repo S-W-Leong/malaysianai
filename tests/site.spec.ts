@@ -9,7 +9,7 @@ test('public destinations load and the hero uses responsive images', async ({ pa
 	const errors: string[] = [];
 	page.on('pageerror', error => errors.push(error.message));
 	for (const [path, heading] of [
-		['/', "Driving Malaysia's"], ['/residency', 'The AI Residency'],
+		['/', 'Learn, build and'], ['/residency', 'The AI Residency'],
 		['/residents', 'Meet the residents'], ['/contact', 'Get in touch'], ['/blog', 'Malaysian AI Blog'],
 	]) {
 		const response = await page.goto(path);
@@ -21,6 +21,19 @@ test('public destinations load and the hero uses responsive images', async ({ pa
 	await expect(page.locator('.hero-art')).toHaveAttribute('srcset', /640w.*1024w.*1672w/);
 	expect(await page.locator('.hero-art').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
 	expect(errors).toEqual([]);
+});
+
+test('homepage copy points people at communities and the add-community contact flow', async ({ page }) => {
+	await page.goto('/');
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('Learn, build and');
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('experience Malaysian AI.');
+	await expect(page.getByRole('link', { name: 'Explore communities' })).toHaveAttribute('href', '#communities');
+	await page.locator('#communities').scrollIntoViewIfNeeded();
+	await expect(page.getByRole('heading', { level: 2, name: /Malaysia's AI/ })).toBeVisible();
+	await page.getByRole('link', { name: 'Add your community' }).click();
+	await expect(page).toHaveURL(/subject=/);
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Add your community');
+	await expect(page.locator('#contact-whatsapp')).toHaveAttribute('href', /add%20my%20community/i);
 });
 
 test('image dialog contains keyboard focus, closes and survives page navigation', async ({ page }) => {

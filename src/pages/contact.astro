@@ -1,10 +1,33 @@
 ---
 import InfoPage from '../layouts/InfoPage.astro';
-import { CONTACT_WHATSAPP, LUMA_URL, VENUE_ADDRESS, VENUE_MAPS_URL } from '../consts';
+import { ADD_COMMUNITY_WHATSAPP, CONTACT_WHATSAPP, LUMA_URL, VENUE_ADDRESS, VENUE_MAPS_URL } from '../consts';
 ---
 <InfoPage title="Get in touch" description="Questions about the community, residency, or events? Send the Malaysian AI team a message.">
-	<div class="actions"><a class="site-button" href={CONTACT_WHATSAPP}>Message us on WhatsApp</a><a href={LUMA_URL}>View upcoming events</a></div>
+	<div class="actions">
+		<a
+			class="site-button"
+			id="contact-whatsapp"
+			href={CONTACT_WHATSAPP}
+			data-community-href={ADD_COMMUNITY_WHATSAPP}
+		>Message us on WhatsApp</a>
+		<a href={LUMA_URL}>View upcoming events</a>
+	</div>
 	<h2>Find us</h2>
 	<p>{VENUE_ADDRESS}</p>
 	<a href={VENUE_MAPS_URL}>Directions on Google Maps</a>
 </InfoPage>
+
+<script>
+	const subject = new URLSearchParams(location.search).get('subject') ?? '';
+	if (subject.toLowerCase().includes('add my community')) {
+		const title = 'Add your community';
+		const description = "Tell us about your community — name, website, what you run, and where you meet. We'll get you into the directory.";
+		document.title = `${title} | Malaysian AI`;
+		const heading = document.querySelector('.info-page h1');
+		const lede = document.querySelector('.info-page header p');
+		const whatsapp = document.querySelector<HTMLAnchorElement>('#contact-whatsapp');
+		if (heading) heading.textContent = title;
+		if (lede) lede.textContent = description;
+		if (whatsapp?.dataset.communityHref) whatsapp.href = whatsapp.dataset.communityHref;
+	}
+</script>
