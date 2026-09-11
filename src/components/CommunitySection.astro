@@ -168,14 +168,6 @@ const startIndex = 0;
 				))
 			}
 		</ul>
-
-		<div class="community-invite">
-			<p>
-				Run a community that isn't listed yet? We're building this as a shared directory for
-				Malaysia's AI scene — filled in by the people who organise it.
-			</p>
-			<a href={ADD_COMMUNITY_HREF}>Submit a community <span aria-hidden="true">↗</span></a>
-		</div>
 	</div>
 </section>
 
@@ -435,14 +427,12 @@ const startIndex = 0;
 		justify-content: center;
 	}
 
-	.community-actions a:not(.site-button),
-	.community-invite a {
+	.community-actions a:not(.site-button) {
 		color: inherit;
 		text-underline-offset: 0.22em;
 	}
 
-	.community-actions a:focus-visible,
-	.community-invite a:focus-visible {
+	.community-actions a:focus-visible {
 		outline: 2px solid var(--focus-color);
 		outline-offset: 4px;
 	}
@@ -572,22 +562,6 @@ const startIndex = 0;
 		margin: 0;
 		padding: 0;
 		list-style: none;
-	}
-
-	.community-invite {
-		display: grid;
-		gap: 0.85rem;
-		justify-items: center;
-		width: min(36rem, 100%);
-		margin: 0 auto;
-		text-align: center;
-	}
-
-	.community-invite p {
-		margin: 0;
-		color: rgb(224 232 244 / 0.68);
-		font-size: clamp(0.9rem, 1.15vw, 1.02rem);
-		line-height: var(--leading-body);
 	}
 
 	.sr-only {
