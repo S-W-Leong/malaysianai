@@ -258,3 +258,22 @@ test('theme toggle follows the system scheme and can lock light or dark', async 
 	await expect(page.locator('html')).toHaveAttribute('data-theme-preference', 'system');
 	await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });
+
+test('Tizen follows the system scheme and can lock dark cutouts', async ({ browser }) => {
+	const context = await browser.newContext({
+		...test.info().project.use,
+		colorScheme: 'light',
+		userAgent: 'Mozilla/5.0 (SMART-TV; LINUX; Tizen 5.5) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.4 Chrome/69.0.3497.106 TV Safari/537.36',
+	});
+	const page = await context.newPage();
+	await page.route('**/*', route => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());
+	await page.goto('/');
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+	await expect(page.locator('.hero-card')).toHaveCSS('background-color', 'rgb(244, 239, 230)');
+	await expect(page.locator('.hero-card h1')).toHaveCSS('color', 'rgb(16, 43, 42)');
+	await page.getByRole('radio', { name: 'Dark' }).click();
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+	await expect(page.locator('.hero-card')).toHaveCSS('background-color', 'rgb(6, 9, 15)');
+	await expect(page.locator('.hero-card h1')).toHaveCSS('color', 'rgb(255, 253, 246)');
+	await context.close();
+});

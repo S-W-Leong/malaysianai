@@ -57,9 +57,11 @@ const structuredData = {
 	(() => {
 		const stored = localStorage.getItem('malaysianai-theme');
 		const preference = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
-		const theme = preference === 'system'
-			? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
-			: preference;
+		const theme = preference === 'light' || preference === 'dark'
+			? preference
+			: (window.matchMedia('(prefers-color-scheme: dark)').matches
+				? 'dark'
+				: (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
 		const root = document.documentElement;
 		root.dataset.theme = theme;
 		root.dataset.themePreference = preference;
