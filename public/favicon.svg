@@ -1,30 +1,5 @@
-<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-  <path
-    fill="#0F2A2B"
-    fill-rule="evenodd"
-    d="
-      M59.15 11.53
-      Q64.00 8.00 68.85 11.53
-      L112.41 43.17
-      Q117.26 46.70 115.41 52.40
-      L98.77 103.60
-      Q96.92 109.30 90.92 109.30
-      L37.08 109.30
-      Q31.08 109.30 29.23 103.60
-      L12.59 52.40
-      Q10.74 46.70 15.59 43.17
-      Z
-      M60.76 36.35
-      Q64.00 34.00 67.24 36.35
-      L89.30 52.38
-      Q92.53 54.73 91.30 58.53
-      L82.87 84.47
-      Q81.63 88.27 77.63 88.27
-      L50.37 88.27
-      Q46.37 88.27 45.13 84.47
-      L36.70 58.53
-      Q35.47 54.73 38.70 52.38
-      Z
-    "
-  />
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Malaysian AI</title>
+  <image href="data:image/png;base64,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" width="64" height="64"/>
 </svg>

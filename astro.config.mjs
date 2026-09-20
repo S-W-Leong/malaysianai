@@ -50,12 +50,12 @@ export default defineConfig({
 		},
 		{
 			provider: fontProviders.fontsource(),
-			name: 'Instrument Serif',
+			name: 'Newsreader',
 			cssVariable: '--font-display',
 			weights: [400],
 			styles: ['normal'],
 			subsets: ['latin'],
-			fallbacks: ['Baskerville', 'Iowan Old Style', 'Times New Roman', 'serif'],
+			fallbacks: ['Georgia', 'Iowan Old Style', 'Times New Roman', 'serif'],
 		},
 		{
 			provider: fontProviders.local(),

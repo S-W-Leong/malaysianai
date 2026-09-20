@@ -1,6 +1,8 @@
 ---
+import BrandLockup from './BrandLockup.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { AIMTO_URL, LUMA_URL } from '../consts';
+import { BRAND_WORDMARK } from '../lib/brand';
 const year = new Date().getFullYear();
 
 const groups = [
@@ -27,8 +29,7 @@ const groups = [
 	<div class="footer-grid">
 		<div class="footer-intro">
 			<a class="footer-brand" href="/" aria-label="Malaysian AI home">
-				<img src="/malaysian-ai-batik-logo-bw.svg" alt="" width="880" height="880" loading="lazy" />
-				<span>Malaysian AI</span>
+				<BrandLockup loading="lazy" />
 			</a>
 			<p>
 				Discover Malaysia's AI communities and events — meetups, builder groups, and
@@ -63,7 +64,7 @@ const groups = [
 		</div>
 	</div>
 
-	<div class="footer-wordmark" aria-hidden="true">Malaysian AI</div>
+	<div class="footer-wordmark" aria-hidden="true">{BRAND_WORDMARK}</div>
 	<div class="footer-appearance">
 		<ThemeToggle />
 	</div>
@@ -90,18 +91,10 @@ const groups = [
 
 	.footer-brand {
 		display: inline-flex;
-		gap: 0.7rem;
-		align-items: center;
+		height: 2.35rem;
 		width: fit-content;
-		font-size: var(--text-base);
-		font-weight: 600;
+		color: var(--text-heading);
 		text-decoration: none;
-	}
-
-	.footer-brand img {
-		width: 2rem;
-		height: 2rem;
-		object-fit: contain;
 	}
 
 	.footer-intro > p {
@@ -179,10 +172,10 @@ const groups = [
 		width: min(92rem, 100%);
 		margin: clamp(5.5rem, 10vw, 9rem) auto 0;
 		color: var(--footer-wordmark-color);
-		font-family: var(--font-body);
-		font-size: clamp(6rem, 14vw, 14rem);
+		font-family: var(--font-display);
+		font-size: clamp(5.5rem, 13vw, 13rem);
 		font-weight: 400;
-		letter-spacing: -0.06em;
+		letter-spacing: -0.04em;
 		line-height: 0.72;
 		text-align: center;
 		white-space: nowrap;

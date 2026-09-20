@@ -20,7 +20,6 @@ const { immersive = false, neutral = false, ...metadata } = Astro.props;
 		<BaseHead {...metadata} />
 		<Font cssVariable="--font-body" preload />
 		<Font cssVariable="--font-display" preload />
-		<Font cssVariable="--font-pixel" preload={immersive} />
 		<ClientRouter fallback="swap" />
 	</head>
 	<body class:list={{ immersive }}>
