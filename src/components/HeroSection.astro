@@ -163,7 +163,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 			return `A ${n(radius)} ${n(radius)} 0 0 ${cross > 0 ? 1 : 0} ${n(toX)} ${n(toY)}`;
 		};
 
-		let outline = '';
+		let outline: string;
 		if (desktop) {
 			const hy = headerBox.b;
 			const hx = headerBox.r;
