@@ -9,7 +9,7 @@ test('public destinations load and the hero uses responsive images', async ({ pa
 	const errors: string[] = [];
 	page.on('pageerror', error => errors.push(error.message));
 	for (const [path, heading] of [
-		['/', 'Learn, build and'], ['/residency', 'The AI Residency'],
+		['/', 'Learn, build and'], ['/residency', 'Join the Malaysian.ai residency'],
 		['/residents', 'Meet the residents'], ['/contact', 'Get in touch'], ['/blog', 'Malaysian AI Blog'],
 	]) {
 		const response = await page.goto(path);
@@ -87,7 +87,7 @@ test('homepage copy points people at communities and the add-community contact f
 	await expect(page.getByRole('heading', { level: 1 })).toContainText('Learn, build and');
 	await expect(page.getByRole('heading', { level: 1 })).toContainText('experience Malaysian AI.');
 	await expect(page.locator('.hero-card .intro')).toContainText("Discover Malaysia's AI communities and events.");
-	await expect(page.getByRole('link', { name: 'Join residency' })).toHaveAttribute('href', '/residency');
+	await expect(page.locator('.hero-card').getByRole('link', { name: 'Join residency' })).toHaveAttribute('href', '/residency');
 	await page.locator('#communities').scrollIntoViewIfNeeded();
 	await expect(page.getByRole('heading', { level: 2, name: /Malaysia's AI/ })).toBeVisible();
 	await page.getByRole('link', { name: 'Add your community' }).click();
@@ -278,14 +278,25 @@ test('mobile navigation closes on Escape and after selecting a destination', asy
 	test.skip(!isMobile, 'Mobile menu only');
 	await page.goto('/');
 	const menu = page.locator('.mobile-navigation');
-	await menu.locator('summary').click();
-	await expect(menu).toHaveAttribute('open', '');
+	const dialog = menu.getByRole('dialog', { name: 'Menu' });
+	const toggle = menu.getByRole('button', { name: 'Open menu' });
+	const brand = page.locator('.hero-header .brand-mark');
+	const toggleBox = await toggle.boundingBox();
+	const brandBox = await brand.boundingBox();
+	expect(toggleBox).not.toBeNull();
+	expect(brandBox).not.toBeNull();
+	expect(toggleBox!.x).toBeLessThan(brandBox!.x);
+	await expect(page.locator('.nav-cta')).toHaveText('View events');
+	await toggle.click();
+	await expect(dialog).toBeVisible();
+	await expect(dialog.getByRole('link', { name: 'View events' })).toBeVisible();
+	await expect(dialog.getByRole('link', { name: 'Join residency' })).toHaveAttribute('href', 'https://platform.malaysian.ai');
 	await page.keyboard.press('Escape');
-	await expect(menu).not.toHaveAttribute('open', '');
-	await menu.locator('summary').click();
-	await menu.getByRole('link', { name: 'Stories' }).click();
+	await expect(dialog).not.toBeVisible();
+	await toggle.click();
+	await dialog.getByRole('link', { name: 'Stories' }).click();
 	await expect(page).toHaveURL(/\/blog\/?$/);
-	await expect(menu).not.toHaveAttribute('open', '');
+	await expect(dialog).not.toBeVisible();
 });
 
 test('homepage brand mark is visible on mobile', async ({ page, isMobile }) => {
@@ -355,7 +366,7 @@ test('residency announcement banner opens the residency page and can be dismisse
 
 	await banner.click({ position: { x: 24, y: 12 } });
 	await expect(page).toHaveURL(/\/residency\/?$/);
-	await expect(page.getByRole('heading', { level: 1 })).toContainText('The AI Residency');
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('Join the Malaysian.ai residency');
 	await expect(banner).toBeVisible();
 
 	await banner.getByRole('button', { name: 'Dismiss announcement' }).click();

@@ -4,27 +4,53 @@ import showAndTell from '../assets/events/show-and-tell-supabase-ceo.png';
 import ResidentLogo from '../components/ResidentLogo.astro';
 import { residents } from '../data/residents';
 import Layout from '../layouts/Layout.astro';
-import { SITE_TITLE, APPLY_FORM_URL, VENUE_ADDRESS, VENUE_MAPS_URL, VENUE_WAZE_URL } from '../consts';
+import { SITE_TITLE, APPLY_FORM_URL, SHOW_AND_TELL_WHATSAPP, VENUE_ADDRESS, VENUE_MAPS_URL, VENUE_WAZE_URL } from '../consts';
 
-const description = 'A working home for founders building AI products in Malaysia.';
+const description =
+	'A full-time, in-person 8-week residency at the Malaysian.ai space, 1 October to 30 November 2026, for founders, builders, marketers, designers and creators building with AI.';
 ---
 
-<Layout title={`The AI Residency | ${SITE_TITLE}`} description={description} neutral>
+<Layout title={`Join the Malaysian.ai residency | ${SITE_TITLE}`} description={description} neutral>
 	<article class="residency-page">
 		<div class="residency-content">
 			<header class="residency-header">
 				<div class="residency-title">
-					<h1>The AI Residency</h1>
-					<p>Build in Malaysia. Ship for the world.</p>
+					<h1>Join the Malaysian.ai residency.</h1>
+					<p>Full-time, in person · 1 October – 30 November 2026</p>
 				</div>
 				<div class="residency-intro">
-					<p>{description} Co-working space, regular demos, and support with product, engineering, and fundraising.</p>
+					<p>
+						For founders, builders, marketers, designers and creators looking to go
+						all-in on companies, products, research or projects — built with AI.
+						Spend two months at the Malaysian.ai space and make twelve months of
+						progress, surrounded by ambitious people like you.
+					</p>
+					<p>
+						The cohort runs from 1 October to 30 November 2026. Applications close
+						1 October. You'll have a working home, regular demos, and support with
+						product, engineering, and fundraising.
+					</p>
 					<div class="residency-actions" id="apply">
-						<a class="site-button" href={APPLY_FORM_URL}>Apply to the residency</a>
+						<a class="site-button" href={APPLY_FORM_URL}>Apply now</a>
 						<a class="residents-link" href="/residents">Meet the residents <span aria-hidden="true">↗</span></a>
 					</div>
 				</div>
 			</header>
+
+			<dl class="residency-facts">
+				<div>
+					<dt>Cohort</dt>
+					<dd>1 October – 30 November 2026</dd>
+				</div>
+				<div>
+					<dt>Format</dt>
+					<dd>Full-time, in person</dd>
+				</div>
+				<div>
+					<dt>Deadline</dt>
+					<dd>Apply by 1 October</dd>
+				</div>
+			</dl>
 
 			<figure class="residency-photo">
 				<Image
@@ -39,6 +65,15 @@ const description = 'A working home for founders building AI products in Malaysi
 				/>
 				<figcaption>Show &amp; Tell at Malaysian AI</figcaption>
 			</figure>
+
+			<section class="residency-visit" aria-labelledby="visit-title">
+				<h2 id="visit-title">Come on a Thursday</h2>
+				<p>
+					Join a Show &amp; Tell session to meet the community and get a feel for
+					what the residency is like before you apply.
+				</p>
+				<a href={SHOW_AND_TELL_WHATSAPP}>Join a Thursday Show &amp; Tell <span aria-hidden="true">↗</span></a>
+			</section>
 
 			<section class="resident-teams" aria-labelledby="teams-title">
 				<h2 id="teams-title">Resident teams</h2>
@@ -102,6 +137,11 @@ const description = 'A working home for founders building AI products in Malaysi
 		line-height: 1.5;
 	}
 
+	.residency-intro {
+		display: grid;
+		gap: 1rem;
+	}
+
 	.residency-intro > p {
 		max-width: 32rem;
 		margin: 0;
@@ -126,6 +166,30 @@ const description = 'A working home for founders building AI products in Malaysi
 
 	.residents-link span { margin-left: 0.25rem; }
 
+	.residency-facts {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1.25rem 1.5rem;
+		margin: 0 0 clamp(2rem, 4vw, 3rem);
+		padding: 1.15rem 0;
+		border-top: 1px solid var(--page-border);
+		border-bottom: 1px solid var(--page-border);
+	}
+
+	.residency-facts dt {
+		margin: 0 0 0.3rem;
+		color: var(--page-text);
+		font-size: var(--text-xs);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.residency-facts dd {
+		margin: 0;
+		font-size: var(--text-sm);
+		line-height: 1.45;
+	}
+
 	.residency-photo { margin: 0; }
 
 	.residency-photo :global(img) {
@@ -134,6 +198,7 @@ const description = 'A working home for founders building AI products in Malaysi
 		height: auto;
 		aspect-ratio: 3 / 2;
 		object-fit: cover;
+		object-position: 50% 40%;
 		border-radius: var(--radius-media);
 	}
 
@@ -142,6 +207,38 @@ const description = 'A working home for founders building AI products in Malaysi
 		color: var(--page-text);
 		font-size: var(--text-xs);
 		line-height: 1.5;
+	}
+
+	.residency-visit {
+		display: grid;
+		grid-template-columns: 7rem minmax(0, 1fr) auto;
+		gap: 0.75rem 1.5rem;
+		align-items: start;
+		padding-top: 1.5rem;
+		margin-top: 1.75rem;
+	}
+
+	.residency-visit h2 {
+		margin: 0;
+		color: var(--page-text);
+		font-size: var(--text-xs);
+		font-weight: 400;
+		line-height: var(--leading-body);
+	}
+
+	.residency-visit p {
+		max-width: 35rem;
+		margin: 0;
+		font-size: var(--text-sm);
+		line-height: var(--leading-body);
+	}
+
+	.residency-visit a {
+		color: var(--page-text);
+		font-size: 0.8rem;
+		line-height: var(--leading-body);
+		text-decoration: none;
+		white-space: nowrap;
 	}
 
 	.resident-teams { margin-top: 2rem; }
@@ -198,7 +295,8 @@ const description = 'A working home for founders building AI products in Malaysi
 	}
 
 	.residents-link:hover,
-	.home-directions a:hover {
+	.home-directions a:hover,
+	.residency-visit a:hover {
 		color: var(--text-hover);
 		text-decoration: underline;
 		text-underline-offset: 0.25em;
@@ -210,7 +308,9 @@ const description = 'A working home for founders building AI products in Malaysi
 		.resident-logos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 		.residency-header { grid-template-columns: 1fr; gap: 1.5rem; }
 		.residency-intro > p { max-width: 36rem; }
-		.residency-home { grid-template-columns: 1fr; gap: 0.75rem; margin-top: 1.5rem; }
+		.residency-facts { grid-template-columns: 1fr; gap: 1rem; }
+		.residency-home,
+		.residency-visit { grid-template-columns: 1fr; gap: 0.75rem; margin-top: 1.5rem; }
 		.home-directions { margin-top: 0.25rem; }
 	}
 </style>

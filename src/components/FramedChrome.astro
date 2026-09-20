@@ -1,6 +1,6 @@
 ---
 import BrandLockup from './BrandLockup.astro';
-import { LUMA_URL } from '../consts';
+import { APPLY_FORM_URL, LUMA_URL } from '../consts';
 
 interface Props {
 	home?: boolean;
@@ -19,6 +19,34 @@ const links = [
 ---
 
 <header class:list={['hero-header', { 'is-minimal': minimal }]}>
+	<div class="mobile-navigation">
+		<button type="button" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-mobile-menu">
+			<span class="hamburger" aria-hidden="true">
+				<span></span>
+				<span></span>
+				<span></span>
+			</span>
+		</button>
+		<dialog id="site-mobile-menu" class="mobile-menu" aria-label="Menu">
+			<button type="button" class="menu-toggle is-close" aria-label="Close menu">
+				<span class="hamburger" aria-hidden="true">
+					<span></span>
+					<span></span>
+					<span></span>
+				</span>
+			</button>
+			<div class="mobile-menu-body">
+				<nav aria-label="Mobile navigation">
+					{links.map(link => (
+						<a href={link.href} aria-current={current === link.id ? 'page' : undefined}>{link.label}</a>
+					))}
+					<a class="mobile-menu-events" href={LUMA_URL}>View events</a>
+				</nav>
+				<a class="mobile-menu-join site-button" href={APPLY_FORM_URL}>Join residency</a>
+			</div>
+		</dialog>
+	</div>
+
 	<div class="brand-panel" transition:name="site-brand" transition:persist="site-brand">
 		<a class="brand-mark" href="/" aria-label="Malaysian AI home">
 			<BrandLockup />
@@ -30,19 +58,10 @@ const links = [
 			<a href={link.href} aria-current={current === link.id ? 'page' : undefined}>{link.label}</a>
 		))}
 	</nav>
-
-	<details class="mobile-navigation">
-		<summary class="site-button">Menu <span aria-hidden="true">⌄</span></summary>
-		<nav aria-label="Mobile navigation">
-			{links.map(link => (
-				<a href={link.href} aria-current={current === link.id ? 'page' : undefined}>{link.label}</a>
-			))}
-		</nav>
-	</details>
 </header>
 
 <div class:list={['hero-cta-panel', { 'is-minimal': minimal }]}>
-	<a class="nav-cta site-button" href={LUMA_URL}>Find an event</a>
+	<a class="nav-cta site-button" href={LUMA_URL}>View events</a>
 </div>
 
 <script>
@@ -53,24 +72,43 @@ const links = [
 		navigationController = new AbortController();
 		const { signal } = navigationController;
 
-		document.querySelectorAll<HTMLDetailsElement>('.mobile-navigation').forEach(menu => {
-			menu.addEventListener('click', event => {
-				if ((event.target as Element).closest('a')) menu.open = false;
+		document.querySelectorAll<HTMLElement>('.mobile-navigation').forEach(root => {
+			const toggle = root.querySelector<HTMLButtonElement>('.menu-toggle:not(.is-close)');
+			const close = root.querySelector<HTMLButtonElement>('.is-close');
+			const dialog = root.querySelector<HTMLDialogElement>('.mobile-menu');
+			if (!toggle || !close || !dialog) return;
+
+			const setExpanded = (open: boolean) => {
+				toggle.setAttribute('aria-expanded', String(open));
+			};
+
+			toggle.addEventListener('click', () => {
+				if (dialog.open) dialog.close();
+				else void dialog.showModal();
 			}, { signal });
-			menu.addEventListener('keydown', event => {
-				if (event.key === 'Escape') {
-					menu.open = false;
-					menu.querySelector('summary')?.focus();
-				}
+
+			close.addEventListener('click', () => dialog.close(), { signal });
+
+			dialog.addEventListener('click', event => {
+				if ((event.target as Element).closest('a')) dialog.close();
 			}, { signal });
-			document.addEventListener('click', event => {
-				if (!menu.contains(event.target as Node)) menu.open = false;
+
+			document.addEventListener('keydown', event => {
+				if (event.key === 'Escape' && dialog.open) dialog.close();
 			}, { signal });
+
+			dialog.addEventListener('close', () => setExpanded(false), { signal });
+			setExpanded(dialog.open);
 		});
 	}
 
 	document.addEventListener('astro:page-load', prepareNavigation);
-	document.addEventListener('astro:before-swap', () => navigationController?.abort());
+	document.addEventListener('astro:before-swap', () => {
+		document.querySelectorAll<HTMLDialogElement>('.mobile-menu').forEach(dialog => {
+			if (dialog.open) dialog.close();
+		});
+		navigationController?.abort();
+	});
 </script>
 
 <style>
@@ -136,17 +174,14 @@ const links = [
 		pointer-events: auto;
 	}
 
-	.hero-nav a,
-	.mobile-navigation a {
+	.hero-nav a {
 		font: 400 0.82rem / 1.2 var(--font-body);
 		text-decoration: none;
 		white-space: nowrap;
 	}
 
 	.hero-nav a:hover,
-	.hero-nav a[aria-current='page'],
-	.mobile-navigation a:hover,
-	.mobile-navigation a[aria-current='page'] {
+	.hero-nav a[aria-current='page'] {
 		text-decoration: underline;
 		text-underline-offset: 0.3rem;
 	}
@@ -180,6 +215,7 @@ const links = [
 			padding-right: var(--hero-gap, 0.6rem);
 		}
 		.hero-nav { display: none; }
+		.brand-panel { padding-left: 0.35rem; }
 		.brand-mark {
 			height: var(--hero-logo-width-mobile, 1.55rem);
 		}
@@ -194,35 +230,147 @@ const links = [
 
 		.mobile-navigation {
 			position: relative;
-			display: block;
-			margin-left: 0.35rem;
+			z-index: 1;
+			display: flex;
+			align-items: center;
+			align-self: stretch;
+			padding-left: var(--hero-gap, 0.6rem);
 			pointer-events: auto;
 		}
-		.mobile-navigation summary { height: var(--hero-control-height, 2rem); list-style: none; }
-		.mobile-navigation summary::-webkit-details-marker { display: none; }
-		.mobile-navigation summary span { transition: transform 150ms ease; }
-		.mobile-navigation[open] summary span { transform: rotate(180deg); }
-		.mobile-navigation nav {
-			position: absolute;
-			top: calc(100% + 1rem);
-			left: 0;
+
+		.menu-toggle {
 			display: grid;
-			gap: 0.25rem;
-			width: min(18rem, calc(100vw - var(--hero-brand-width, 4.4rem) - 2rem));
-			padding: 0.5rem;
-			border: 1px solid var(--hairline);
-			border-radius: 0.7rem;
-			color: var(--text-bright);
-			background: var(--card-raised);
-			box-shadow: 0 16px 40px rgb(0 0 0 / 0.45);
+			width: 2.5rem;
+			height: 2.5rem;
+			place-items: center;
+			padding: 0;
+			border: 0;
+			border-radius: 0.4rem;
+			color: var(--text-heading);
+			background: transparent;
+			cursor: pointer;
 		}
-		.mobile-navigation a { padding: 0.75rem; }
+
+		.menu-toggle:focus-visible {
+			outline: 2px solid var(--focus-color);
+			outline-offset: 3px;
+		}
+
+		.hamburger {
+			position: relative;
+			display: block;
+			width: 1.15rem;
+			height: 0.82rem;
+		}
+
+		.hamburger span {
+			position: absolute;
+			left: 0;
+			display: block;
+			width: 100%;
+			height: 1.5px;
+			border-radius: 1px;
+			background: currentColor;
+			transition: transform 180ms ease, opacity 180ms ease, top 180ms ease;
+		}
+
+		.hamburger span:nth-child(1) { top: 0; }
+		.hamburger span:nth-child(2) { top: 50%; transform: translateY(-50%); }
+		.hamburger span:nth-child(3) { top: calc(100% - 1.5px); }
+
+		.is-close .hamburger span:nth-child(1),
+		.mobile-menu[open] .is-close .hamburger span:nth-child(1) {
+			top: 50%;
+			transform: translateY(-50%) rotate(45deg);
+		}
+
+		.is-close .hamburger span:nth-child(2) {
+			opacity: 0;
+		}
+
+		.is-close .hamburger span:nth-child(3) {
+			top: 50%;
+			transform: translateY(-50%) rotate(-45deg);
+		}
+
+		.mobile-menu {
+			inset: 0;
+			width: 100vw;
+			height: 100svh;
+			max-width: none;
+			max-height: 100svh;
+			margin: 0;
+			padding:
+				max(0.65rem, env(safe-area-inset-top, 0px))
+				max(1.25rem, env(safe-area-inset-right, 0px))
+				max(1.75rem, calc(env(safe-area-inset-bottom, 0px) + 1rem))
+				max(0.65rem, env(safe-area-inset-left, 0px));
+			border: 0;
+			overflow: hidden;
+			color: var(--text-heading);
+			background: var(--page-background);
+		}
+
+		.mobile-menu[open] {
+			display: flex;
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.mobile-menu::backdrop {
+			background: var(--page-background);
+		}
+
+		.mobile-menu-body {
+			display: flex;
+			flex: 1;
+			flex-direction: column;
+			justify-content: space-between;
+			gap: 1.5rem;
+			min-height: 0;
+			padding: 0.85rem 0.6rem 0.35rem;
+		}
+
+		.mobile-menu-body nav {
+			display: grid;
+			align-content: start;
+			gap: 0.1rem;
+		}
+
+		.mobile-menu-body nav a {
+			padding: 0.7rem 0;
+			font: 400 clamp(1.55rem, 7vw, 2rem) / 1.15 var(--font-display);
+			letter-spacing: -0.03em;
+			text-decoration: none;
+		}
+
+		.mobile-menu-body nav a:hover,
+		.mobile-menu-body nav a[aria-current='page'] {
+			text-decoration: underline;
+			text-underline-offset: 0.22em;
+		}
+
+		.mobile-menu-events {
+			margin-top: 0.55rem;
+		}
+
+		.mobile-menu-join {
+			width: 100%;
+			min-height: 3.1rem;
+			font-size: 0.95rem;
+		}
 	}
 
 	@media (max-width: 420px) {
 		.hero-header {
 			--hero-brand-width: 3.8rem;
 			--hero-logo-width-mobile: 1.85rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hamburger span {
+			transition: none;
 		}
 	}
 </style>
