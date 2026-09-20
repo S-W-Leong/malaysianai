@@ -13,6 +13,8 @@ html[data-theme='dark'] {
 	--text-section-title: clamp(1.3rem, 1.8vw, 1.7rem);
 	--leading-body: 1.6;
 	--radius-media: 0.7rem;
+	--section-space: clamp(5.5rem, 12vh, 9rem);
+	--section-space-half: clamp(2.75rem, 6vh, 4.5rem);
 
 	--color-white: #fff;
 	--site-background: #07101a;

@@ -79,8 +79,12 @@ const links = [
 		z-index: 4;
 		top: 0;
 		left: 0;
-		width: var(--hero-panel-width, 29rem);
+		display: flex;
+		align-items: center;
+		width: max-content;
+		max-width: calc(100% - 11rem);
 		height: var(--hero-header-height, 4.25rem);
+		padding-right: 1.2rem;
 		pointer-events: none;
 	}
 
@@ -99,14 +103,12 @@ const links = [
 	}
 
 	.brand-panel {
-		position: absolute;
-		top: 0;
-		left: 0;
+		position: relative;
 		display: grid;
-		width: var(--hero-brand-width, 12.15rem);
-		height: var(--hero-header-height, 4.25rem);
+		width: auto;
+		height: 100%;
 		place-items: center start;
-		padding: 0 var(--hero-gap, 1rem);
+		padding: 0 0 0 var(--hero-gap, 1rem);
 		background: #06090f;
 		background: var(--hero-frame, var(--page-background));
 		pointer-events: auto;
@@ -122,16 +124,13 @@ const links = [
 	}
 
 	.hero-nav {
-		position: absolute;
-		top: var(--hero-gap, 1rem);
-		right: var(--hero-gap, 1rem);
-		left: var(--hero-brand-width, 12.15rem);
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: flex-start;
 		gap: 1.15rem;
 		height: var(--hero-control-height, 2.25rem);
-		padding: 0 0.5rem 0 1.35rem;
+		padding: 0 0.15rem 0 1.35rem;
 		color: var(--text-heading);
 		background: transparent;
 		pointer-events: auto;
@@ -175,7 +174,11 @@ const links = [
 	a:focus-visible { outline: 2px solid var(--focus-color); outline-offset: 3px; }
 
 	@media (max-width: 700px) {
-		.hero-header { width: var(--hero-panel-width, calc(100% - 0.6rem)); }
+		.hero-header {
+			width: max-content;
+			max-width: calc(100% - 8.5rem);
+			padding-right: var(--hero-gap, 0.6rem);
+		}
 		.hero-nav { display: none; }
 		.brand-mark {
 			height: var(--hero-logo-width-mobile, 1.55rem);
@@ -190,10 +193,9 @@ const links = [
 		}
 
 		.mobile-navigation {
-			position: absolute;
-			top: var(--hero-gap, 0.6rem);
-			left: var(--hero-brand-width, 4.4rem);
+			position: relative;
 			display: block;
+			margin-left: 0.35rem;
 			pointer-events: auto;
 		}
 		.mobile-navigation summary { height: var(--hero-control-height, 2rem); list-style: none; }

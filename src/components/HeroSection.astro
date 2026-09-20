@@ -101,8 +101,8 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		<div class="hero-copy">
 			<h1 id="hero-title">Learn, build and<br /> experience Malaysian AI.</h1>
 			<p class="intro">
-				Discover Malaysia's AI communities and events. Meetups, builder groups, learning
-				sessions and workshops.
+				Discover Malaysia's AI communities and events. Join weekly meetups, AI learning
+				sessions, workshops and an 8 week AI residency.
 			</p>
 		</div>
 		<div class="hero-actions">
@@ -229,12 +229,16 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 	function mountHeroOutline() {
 		outlineCleanup?.();
 		const shell = document.querySelector('.hero-shell');
+		const header = shell?.querySelector('.hero-header');
 		const card = shell?.querySelector('.hero-card');
 		if (!shell) return;
 		const observer = new ResizeObserver(scheduleHeroOutline);
 		observer.observe(shell);
+		if (header) observer.observe(header);
+		if (card) observer.observe(card);
 		window.addEventListener('resize', scheduleHeroOutline);
 		card?.addEventListener('animationend', scheduleHeroOutline);
+		void document.fonts?.ready.then(scheduleHeroOutline);
 		window.setTimeout(scheduleHeroOutline, 1400);
 		scheduleHeroOutline();
 		outlineCleanup = () => {
@@ -391,7 +395,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		bottom: 0;
 		left: 0;
 		overflow: visible;
-		width: var(--hero-panel-width);
+		width: fit-content;
 		max-width: calc(100% - var(--hero-gap));
 		padding: 2.1rem 3rem 2rem;
 		border: 0;
