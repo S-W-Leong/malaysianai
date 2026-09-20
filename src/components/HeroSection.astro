@@ -129,9 +129,10 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		--hero-line: var(--border-color);
 		--hero-accent: #315d9f;
 		--hero-gap: 1rem;
+		--hero-radius: 0.95rem;
 		--hero-panel-width: 38rem;
-		--hero-brand-width: 13.25rem;
-		--hero-logo-width: 2.2rem;
+		--hero-brand-width: 10.25rem;
+		--hero-logo-width: 1.5rem;
 		--hero-control-height: 2.25rem;
 		--hero-header-height: calc(var(--hero-gap) * 2 + var(--hero-control-height));
 		min-height: max(46rem, 100svh);
@@ -148,9 +149,25 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		left: var(--hero-gap);
 		overflow: hidden;
 		border: 1.5px solid var(--hero-line);
-		border-radius: 0.95rem;
+		border-radius: var(--hero-radius);
 		background: var(--image-background);
 		animation: media-reveal 1.2s 0.05s cubic-bezier(0.2, 0.75, 0.2, 1) both;
+	}
+
+	.hero-media::after {
+		position: absolute;
+		z-index: 2;
+		left: calc(var(--hero-panel-width) - var(--hero-gap));
+		bottom: 0;
+		width: var(--hero-radius);
+		height: var(--hero-radius);
+		background: radial-gradient(
+			circle at 100% 0,
+			transparent var(--hero-radius),
+			var(--hero-frame) var(--hero-radius)
+		);
+		content: '';
+		pointer-events: none;
 	}
 
 	.hero-art,
@@ -234,7 +251,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		max-width: calc(100% - var(--hero-gap));
 		padding: 2.1rem 3rem 2rem;
 		border: 0;
-		border-radius: 0 1rem 0 0;
+		border-radius: 0 var(--hero-radius) 0 0;
 		color: #fffdf6;
 		color: var(--hero-copy);
 		background: #06090f;
@@ -243,6 +260,22 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		-webkit-backdrop-filter: none;
 		backdrop-filter: none;
 		animation: panel-arrive 0.8s 0.35s ease-out both;
+	}
+
+	.hero-card::before {
+		position: absolute;
+		z-index: 2;
+		top: calc(-1 * var(--hero-radius));
+		left: var(--hero-gap);
+		width: var(--hero-radius);
+		height: var(--hero-radius);
+		background: radial-gradient(
+			circle at 100% 0,
+			transparent var(--hero-radius),
+			var(--hero-frame) var(--hero-radius)
+		);
+		content: '';
+		pointer-events: none;
 	}
 
 	.hero-card::after {
@@ -257,7 +290,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		height: auto;
 		border-top: 1.5px solid var(--hero-line);
 		border-right: 1.5px solid var(--hero-line);
-		border-top-right-radius: 1rem;
+		border-top-right-radius: var(--hero-radius);
 		background: none;
 		content: '';
 		pointer-events: none;
@@ -356,9 +389,10 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 	@media (max-width: 700px) {
 		.hero-shell {
 			--hero-gap: 0.6rem;
+			--hero-radius: 0.75rem;
 			--hero-panel-width: calc(100% - var(--hero-gap));
-			--hero-brand-width: 10.5rem;
-			--hero-logo-width-mobile: 1.7rem;
+			--hero-brand-width: 8.5rem;
+			--hero-logo-width-mobile: 1.35rem;
 			--hero-control-height: 2rem;
 			min-height: max(42rem, 100svh);
 			padding: var(--hero-gap);
@@ -371,7 +405,11 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 			left: var(--hero-gap);
 			border-left: 0;
 			border-bottom: 0;
-			border-radius: 0.75rem 0.75rem 0 0;
+			border-radius: var(--hero-radius) var(--hero-radius) 0 0;
+		}
+
+		.hero-media::after {
+			display: none;
 		}
 
 		.hero-art {
@@ -390,12 +428,12 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 			left: 0;
 			width: var(--hero-panel-width);
 			padding: 1.5rem 2rem 1.4rem;
-			border-radius: 0 0.85rem 0 0;
+			border-radius: 0 var(--hero-radius) 0 0;
 		}
 
 		.hero-card::after {
 			left: 0;
-			border-top-right-radius: 0.85rem;
+			border-top-right-radius: var(--hero-radius);
 		}
 
 		.hero-card h1 {
@@ -413,6 +451,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 	@media (max-width: 420px) {
 		.hero-shell {
 			--hero-brand-width: 3.8rem;
+			--hero-logo-width-mobile: 1.75rem;
 		}
 	}
 
