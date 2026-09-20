@@ -91,7 +91,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 
 	<FramedChrome home />
 
-	<a class="sky-wordmark" href="/" aria-label="Malaysian AI home">Malaysian AI</a>
+	<a class="sky-wordmark" href="/" aria-label="Malaysian AI home">malaysian.ai</a>
 
 	<section class="hero-card" aria-labelledby="hero-title">
 		<div class="hero-copy">
@@ -129,8 +129,9 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		--hero-line: var(--border-color);
 		--hero-accent: #315d9f;
 		--hero-gap: 1rem;
-		--hero-panel-width: 32rem;
-		--hero-brand-width: 7.2rem;
+		--hero-panel-width: 38rem;
+		--hero-brand-width: 13.25rem;
+		--hero-logo-width: 2.2rem;
 		--hero-control-height: 2.25rem;
 		--hero-header-height: calc(var(--hero-gap) * 2 + var(--hero-control-height));
 		min-height: max(46rem, 100svh);
@@ -184,20 +185,13 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 			linear-gradient(90deg, rgb(9 35 53 / 0.12), transparent 48%);
 	}
 
-	@media (prefers-color-scheme: light) {
-		:global(html:not([data-theme='dark'])) .hero-shade {
-			background:
-				linear-gradient(180deg, rgb(20 52 73 / 0.06), transparent 42%, rgb(16 43 42 / 0.16) 100%),
-				linear-gradient(90deg, rgb(9 35 53 / 0.12), transparent 48%);
-		}
-	}
-
 	.sky-wordmark {
 		position: absolute;
 		left: 50%;
 		color: #fffdf8;
-		font-family: var(--font-pixel);
+		font-family: var(--font-display);
 		font-weight: 400;
+		letter-spacing: -0.03em;
 		line-height: 1;
 		text-align: center;
 		text-decoration: none;
@@ -207,8 +201,26 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		transform: translateX(-50%);
 		z-index: 2;
 		top: clamp(6.5rem, 14vh, 8.5rem);
-		font-size: clamp(1.35rem, 1.8vw, 1.7rem);
+		font-size: clamp(1.55rem, 2.1vw, 2.05rem);
 		animation: soft-rise 0.75s 0.8s ease-out both;
+	}
+
+	:global(html[data-theme='light']) .sky-wordmark {
+		color: #102b2a;
+		text-shadow: 0 1px 16px rgb(255 255 255 / 0.7);
+	}
+
+	@media (prefers-color-scheme: light) {
+		:global(html:not([data-theme='dark'])) .hero-shade {
+			background:
+				linear-gradient(180deg, rgb(20 52 73 / 0.06), transparent 42%, rgb(16 43 42 / 0.16) 100%),
+				linear-gradient(90deg, rgb(9 35 53 / 0.12), transparent 48%);
+		}
+
+		:global(html:not([data-theme='dark'])) .sky-wordmark {
+			color: #102b2a;
+			text-shadow: 0 1px 16px rgb(255 255 255 / 0.7);
+		}
 	}
 
 	.hero-card {
@@ -345,8 +357,8 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		.hero-shell {
 			--hero-gap: 0.6rem;
 			--hero-panel-width: calc(100% - var(--hero-gap));
-			--hero-brand-width: 4.4rem;
-			--hero-logo-width-mobile: 3.2rem;
+			--hero-brand-width: 10.5rem;
+			--hero-logo-width-mobile: 1.7rem;
 			--hero-control-height: 2rem;
 			min-height: max(42rem, 100svh);
 			padding: var(--hero-gap);
@@ -369,7 +381,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		.sky-wordmark {
 			width: calc(100% - 2rem);
 			top: 6.5rem;
-			font-size: 1.25rem;
+			font-size: 1.45rem;
 		}
 
 		.hero-card {
@@ -395,6 +407,12 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 			max-width: 24rem;
 			margin: 0.95rem 0 1.05rem;
 			font-size: 0.8rem;
+		}
+	}
+
+	@media (max-width: 420px) {
+		.hero-shell {
+			--hero-brand-width: 3.8rem;
 		}
 	}
 

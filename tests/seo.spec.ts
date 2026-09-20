@@ -181,7 +181,8 @@ test('site marks paint immediately without waiting for an animation', async ({ p
 	await page.emulateMedia({ reducedMotion: 'no-preference' });
 	await page.goto('/');
 	const icons = await page.locator('link[rel="icon"]').evaluateAll(links => links.map(link => link.getAttribute('href')!));
-	expect(icons).toHaveLength(2);
+	expect(icons).toEqual(expect.arrayContaining(['/favicon-32.png', '/favicon.svg']));
+	expect(icons).toHaveLength(3);
 	const brand = await page.locator('.brand-mark img').getAttribute('src');
 	expect(brand).toBeTruthy();
 	const marks = [...icons, brand!];

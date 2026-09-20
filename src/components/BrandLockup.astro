@@ -1,0 +1,57 @@
+---
+import { BRAND_MARK_SRC, BRAND_WORDMARK_PATH } from '../lib/brand';
+
+interface Props {
+	loading?: 'eager' | 'lazy';
+}
+
+const { loading = 'eager' } = Astro.props;
+---
+
+<span class="brand-lockup">
+	<img
+		class="brand-emblem"
+		src={BRAND_MARK_SRC}
+		alt=""
+		width="512"
+		height="512"
+		loading={loading}
+		decoding="async"
+	/>
+	<svg class="brand-wordmark" viewBox="67.9183 0 284.0817 68" aria-hidden="true" focusable="false">
+		<path d={BRAND_WORDMARK_PATH} fill="currentColor" />
+	</svg>
+</span>
+
+<style>
+	.brand-lockup {
+		display: inline-flex;
+		align-items: stretch;
+		height: 100%;
+		color: inherit;
+	}
+
+	.brand-emblem {
+		display: block;
+		height: 100%;
+		width: auto;
+		max-width: none;
+		aspect-ratio: 1;
+		object-fit: contain;
+	}
+
+	.brand-wordmark {
+		display: block;
+		height: 100%;
+		width: auto;
+		aspect-ratio: 284.0817 / 68;
+		overflow: visible;
+		flex: 0 0 auto;
+	}
+
+	@media (max-width: 420px) {
+		.brand-wordmark {
+			display: none;
+		}
+	}
+</style>
