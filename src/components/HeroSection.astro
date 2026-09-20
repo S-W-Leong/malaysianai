@@ -91,23 +91,162 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 
 	<FramedChrome home />
 
+	<svg class="hero-outline" aria-hidden="true" focusable="false">
+		<path />
+	</svg>
+
 	<a class="sky-wordmark" href="/" aria-label="Malaysian AI home">malaysian.ai</a>
 
 	<section class="hero-card" aria-labelledby="hero-title">
 		<div class="hero-copy">
 			<h1 id="hero-title">Learn, build and<br /> experience Malaysian AI.</h1>
 			<p class="intro">
-				Discover Malaysia's AI communities and events — meetups, builder groups, and workshops
-				across the country. Find your people, join what's happening, or add your community to
-				the list.
+				Discover Malaysia's AI communities and events. Meetups, builder groups, learning
+				sessions and workshops.
 			</p>
 		</div>
 		<div class="hero-actions">
 			<a class="card-link site-button" href={LUMA_URL}>View upcoming events</a>
-			<a class="card-secondary" href="#communities">Explore communities</a>
+			<a class="card-secondary" href="/residency">Join residency</a>
 		</div>
 	</section>
 </div>
+
+<script>
+	function roundCoord(value: number) {
+		return Math.round(value * 100) / 100;
+	}
+
+	function relativeBox(mediaBox: DOMRect, element: Element) {
+		const box = element.getBoundingClientRect();
+		return {
+			l: box.left - mediaBox.left,
+			t: box.top - mediaBox.top,
+			r: box.right - mediaBox.left,
+			b: box.bottom - mediaBox.top,
+		};
+	}
+
+	function drawHeroOutline() {
+		const shell = document.querySelector<HTMLElement>('.hero-shell');
+		const svg = shell?.querySelector<SVGSVGElement>('.hero-outline');
+		const path = svg?.querySelector('path');
+		const media = shell?.querySelector<HTMLElement>('.hero-media');
+		const header = shell?.querySelector<HTMLElement>('.hero-header');
+		const cta = shell?.querySelector<HTMLElement>('.hero-cta-panel');
+		const card = shell?.querySelector<HTMLElement>('.hero-card');
+		if (!shell || !svg || !path || !media || !header || !cta || !card) return;
+
+		const mediaBox = media.getBoundingClientRect();
+		const width = mediaBox.width;
+		const height = mediaBox.height;
+		if (width < 8 || height < 8) return;
+
+		const radius = Math.min(parseFloat(getComputedStyle(media).borderTopLeftRadius) || 15, width / 4, height / 4);
+		const headerBox = relativeBox(mediaBox, header);
+		const ctaBox = relativeBox(mediaBox, cta);
+		const cardBox = relativeBox(mediaBox, card);
+		const desktop = window.matchMedia('(min-width: 701px)').matches;
+
+		const n = (value: number) => roundCoord(value).toString();
+		const move = (x: number, y: number) => `M ${n(x)} ${n(y)}`;
+		const line = (x: number, y: number) => `L ${n(x)} ${n(y)}`;
+		const quarter = (
+			fromX: number,
+			fromY: number,
+			centerX: number,
+			centerY: number,
+			toX: number,
+			toY: number,
+		) => {
+			const cross = (fromX - centerX) * (toY - centerY) - (fromY - centerY) * (toX - centerX);
+			return `A ${n(radius)} ${n(radius)} 0 0 ${cross > 0 ? 1 : 0} ${n(toX)} ${n(toY)}`;
+		};
+
+		let outline: string;
+		if (desktop) {
+			const hy = headerBox.b;
+			const hx = headerBox.r;
+			const cx = Math.max(ctaBox.l, hx + radius * 2);
+			const cy = cardBox.t;
+			const cr = cardBox.r;
+			const r = radius;
+			outline = [
+				move(hx + r, 0),
+				line(cx - r, 0),
+				quarter(cx - r, 0, cx - r, r, cx, r),
+				line(cx, hy - r),
+				quarter(cx, hy - r, cx + r, hy - r, cx + r, hy),
+				line(width - r, hy),
+				quarter(width - r, hy, width - r, hy + r, width, hy + r),
+				line(width, height - r),
+				quarter(width, height - r, width - r, height - r, width - r, height),
+				line(cr + r, height),
+				quarter(cr + r, height, cr + r, height - r, cr, height - r),
+				line(cr, cy + r),
+				quarter(cr, cy + r, cr - r, cy + r, cr - r, cy),
+				line(r, cy),
+				quarter(r, cy, r, cy - r, 0, cy - r),
+				line(0, hy + r),
+				quarter(0, hy + r, r, hy + r, r, hy),
+				line(hx - r, hy),
+				quarter(hx - r, hy, hx - r, hy - r, hx, hy - r),
+				line(hx, r),
+				quarter(hx, r, hx + r, r, hx + r, 0),
+				'Z',
+			].join(' ');
+		} else {
+			const hy = Math.max(headerBox.b, radius);
+			const cy = cardBox.t;
+			const r = radius;
+			outline = [
+				move(r, hy),
+				line(width - r, hy),
+				quarter(width - r, hy, width - r, hy + r, width, hy + r),
+				line(width, cy + r),
+				quarter(width, cy + r, width - r, cy + r, width - r, cy),
+				line(r, cy),
+				quarter(r, cy, r, cy - r, 0, cy - r),
+				line(0, hy + r),
+				quarter(0, hy + r, r, hy + r, r, hy),
+				'Z',
+			].join(' ');
+		}
+
+		svg.setAttribute('viewBox', `0 0 ${n(width)} ${n(height)}`);
+		path.setAttribute('d', outline);
+		media.style.clipPath = `path("${outline}")`;
+	}
+
+	let outlineFrame = 0;
+	let outlineCleanup: (() => void) | undefined;
+
+	function scheduleHeroOutline() {
+		cancelAnimationFrame(outlineFrame);
+		outlineFrame = requestAnimationFrame(drawHeroOutline);
+	}
+
+	function mountHeroOutline() {
+		outlineCleanup?.();
+		const shell = document.querySelector('.hero-shell');
+		const card = shell?.querySelector('.hero-card');
+		if (!shell) return;
+		const observer = new ResizeObserver(scheduleHeroOutline);
+		observer.observe(shell);
+		window.addEventListener('resize', scheduleHeroOutline);
+		card?.addEventListener('animationend', scheduleHeroOutline);
+		window.setTimeout(scheduleHeroOutline, 1400);
+		scheduleHeroOutline();
+		outlineCleanup = () => {
+			observer.disconnect();
+			window.removeEventListener('resize', scheduleHeroOutline);
+			card?.removeEventListener('animationend', scheduleHeroOutline);
+		};
+	}
+
+	document.addEventListener('astro:page-load', mountHeroOutline);
+	document.addEventListener('astro:before-swap', () => outlineCleanup?.());
+</script>
 
 <style>
 	.hero-card > * {
@@ -129,9 +268,10 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		--hero-line: var(--border-color);
 		--hero-accent: #315d9f;
 		--hero-gap: 1rem;
+		--hero-radius: 0.95rem;
 		--hero-panel-width: 38rem;
-		--hero-brand-width: 13.25rem;
-		--hero-logo-width: 2.2rem;
+		--hero-brand-width: 12.15rem;
+		--hero-logo-width: 1.95rem;
 		--hero-control-height: 2.25rem;
 		--hero-header-height: calc(var(--hero-gap) * 2 + var(--hero-control-height));
 		min-height: max(46rem, 100svh);
@@ -147,10 +287,31 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		bottom: var(--hero-gap);
 		left: var(--hero-gap);
 		overflow: hidden;
-		border: 1.5px solid var(--hero-line);
-		border-radius: 0.95rem;
+		border-radius: var(--hero-radius);
 		background: var(--image-background);
 		animation: media-reveal 1.2s 0.05s cubic-bezier(0.2, 0.75, 0.2, 1) both;
+	}
+
+	.hero-outline {
+		position: absolute;
+		z-index: 5;
+		top: var(--hero-gap);
+		right: var(--hero-gap);
+		bottom: var(--hero-gap);
+		left: var(--hero-gap);
+		width: auto;
+		height: auto;
+		overflow: visible;
+		pointer-events: none;
+	}
+
+	.hero-outline path {
+		fill: none;
+		stroke: var(--hero-line);
+		stroke-width: 1.5;
+		stroke-linejoin: round;
+		stroke-linecap: round;
+		vector-effect: non-scaling-stroke;
 	}
 
 	.hero-art,
@@ -234,7 +395,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		max-width: calc(100% - var(--hero-gap));
 		padding: 2.1rem 3rem 2rem;
 		border: 0;
-		border-radius: 0 1rem 0 0;
+		border-radius: 0 var(--hero-radius) 0 0;
 		color: #fffdf6;
 		color: var(--hero-copy);
 		background: #06090f;
@@ -243,24 +404,6 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		-webkit-backdrop-filter: none;
 		backdrop-filter: none;
 		animation: panel-arrive 0.8s 0.35s ease-out both;
-	}
-
-	.hero-card::after {
-		position: absolute;
-		z-index: 0;
-		top: 0;
-		right: 0;
-		bottom: var(--hero-gap);
-		left: var(--hero-gap);
-		display: block;
-		width: auto;
-		height: auto;
-		border-top: 1.5px solid var(--hero-line);
-		border-right: 1.5px solid var(--hero-line);
-		border-top-right-radius: 1rem;
-		background: none;
-		content: '';
-		pointer-events: none;
 	}
 
 	.hero-copy {
@@ -356,9 +499,10 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 	@media (max-width: 700px) {
 		.hero-shell {
 			--hero-gap: 0.6rem;
+			--hero-radius: 0.75rem;
 			--hero-panel-width: calc(100% - var(--hero-gap));
-			--hero-brand-width: 10.5rem;
-			--hero-logo-width-mobile: 1.7rem;
+			--hero-brand-width: 9.6rem;
+			--hero-logo-width-mobile: 1.6rem;
 			--hero-control-height: 2rem;
 			min-height: max(42rem, 100svh);
 			padding: var(--hero-gap);
@@ -369,9 +513,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 			right: var(--hero-gap);
 			bottom: var(--hero-gap);
 			left: var(--hero-gap);
-			border-left: 0;
-			border-bottom: 0;
-			border-radius: 0.75rem 0.75rem 0 0;
+			border-radius: var(--hero-radius) var(--hero-radius) 0 0;
 		}
 
 		.hero-art {
@@ -390,12 +532,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 			left: 0;
 			width: var(--hero-panel-width);
 			padding: 1.5rem 2rem 1.4rem;
-			border-radius: 0 0.85rem 0 0;
-		}
-
-		.hero-card::after {
-			left: 0;
-			border-top-right-radius: 0.85rem;
+			border-radius: 0 var(--hero-radius) 0 0;
 		}
 
 		.hero-card h1 {
@@ -413,6 +550,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 	@media (max-width: 420px) {
 		.hero-shell {
 			--hero-brand-width: 3.8rem;
+			--hero-logo-width-mobile: 1.85rem;
 		}
 	}
 

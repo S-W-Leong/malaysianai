@@ -86,7 +86,8 @@ test('homepage copy points people at communities and the add-community contact f
 	await page.goto('/');
 	await expect(page.getByRole('heading', { level: 1 })).toContainText('Learn, build and');
 	await expect(page.getByRole('heading', { level: 1 })).toContainText('experience Malaysian AI.');
-	await expect(page.getByRole('link', { name: 'Explore communities' })).toHaveAttribute('href', '#communities');
+	await expect(page.locator('.hero-card .intro')).toContainText("Discover Malaysia's AI communities and events.");
+	await expect(page.getByRole('link', { name: 'Join residency' })).toHaveAttribute('href', '/residency');
 	await page.locator('#communities').scrollIntoViewIfNeeded();
 	await expect(page.getByRole('heading', { level: 2, name: /Malaysia's AI/ })).toBeVisible();
 	await page.getByRole('link', { name: 'Add your community' }).click();

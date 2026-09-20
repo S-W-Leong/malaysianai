@@ -13,7 +13,7 @@ const links = [
 	{ id: 'about', href: '/about', label: 'About' },
 	{ id: 'events', href: home ? '#events' : '/#events', label: 'Events' },
 	{ id: 'communities', href: home ? '#communities' : '/#communities', label: 'Communities' },
-	{ id: 'residency', href: home ? '#residency' : '/#residency', label: 'Residency' },
+	{ id: 'residency', href: '/residency', label: 'Residency' },
 	{ id: 'stories', href: '/blog', label: 'Stories' },
 ] as const;
 ---
@@ -88,25 +88,11 @@ const links = [
 		position: absolute;
 		z-index: -1;
 		top: 0;
-		right: 0.95rem;
-		bottom: auto;
-		left: var(--hero-brand-width, 7.2rem);
-		height: var(--hero-header-height, 4.25rem);
-		border-bottom: 1.5px solid var(--hero-line, var(--border-color));
-		background: #06090f;
-		background: var(--hero-frame, var(--page-background));
-		content: '';
-	}
-
-	.hero-header::after {
-		position: absolute;
-		top: var(--hero-gap, 1rem);
 		right: 0;
-		width: 0.95rem;
-		height: calc(var(--hero-header-height, 4.25rem) - var(--hero-gap, 1rem));
-		border-right: 1.5px solid var(--hero-line, var(--border-color));
-		border-bottom: 1.5px solid var(--hero-line, var(--border-color));
-		border-bottom-right-radius: 0.95rem;
+		bottom: auto;
+		left: 0;
+		height: var(--hero-header-height, 4.25rem);
+		border-bottom-right-radius: var(--hero-radius, 0.95rem);
 		background: #06090f;
 		background: var(--hero-frame, var(--page-background));
 		content: '';
@@ -117,23 +103,18 @@ const links = [
 		top: 0;
 		left: 0;
 		display: grid;
-		width: var(--hero-brand-width, 13.75rem);
+		width: var(--hero-brand-width, 12.15rem);
 		height: var(--hero-header-height, 4.25rem);
 		place-items: center start;
 		padding: 0 var(--hero-gap, 1rem);
-		border-bottom-right-radius: 0.95rem;
 		background: #06090f;
 		background: var(--hero-frame, var(--page-background));
 		pointer-events: auto;
 	}
 
-	.brand-panel::after {
-		display: none;
-	}
-
 	.brand-mark {
 		display: inline-flex;
-		height: var(--hero-logo-width, 2.35rem);
+		height: var(--hero-logo-width, 1.95rem);
 		width: auto;
 		min-width: 0;
 		min-height: 0;
@@ -144,16 +125,15 @@ const links = [
 		position: absolute;
 		top: var(--hero-gap, 1rem);
 		right: var(--hero-gap, 1rem);
-		left: var(--hero-brand-width, 13.75rem);
+		left: var(--hero-brand-width, 12.15rem);
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		gap: 0.9rem;
+		justify-content: flex-start;
+		gap: 1.15rem;
 		height: var(--hero-control-height, 2.25rem);
-		padding: 0.35rem 0.85rem;
-		border-radius: var(--button-radius);
-		color: var(--button-text);
-		background: var(--button-background);
+		padding: 0 0.5rem 0 1.35rem;
+		color: var(--text-heading);
+		background: transparent;
 		pointer-events: auto;
 	}
 
@@ -182,28 +162,11 @@ const links = [
 		gap: 0.45rem;
 		padding: var(--hero-gap, 1rem);
 		height: var(--hero-header-height, 4.25rem);
-		border-bottom-left-radius: 0.95rem;
-		background: #06090f;
+		border-bottom-left-radius: var(--hero-radius, 0.95rem);
 		background: var(--hero-frame, var(--page-background));
 	}
 
-	.hero-cta-panel::after {
-		position: absolute;
-		top: var(--hero-gap, 1rem);
-		right: var(--hero-gap, 1rem);
-		bottom: 0;
-		left: 0;
-		border-bottom: 1.5px solid var(--hero-line, var(--border-color));
-		border-left: 1.5px solid var(--hero-line, var(--border-color));
-		border-bottom-left-radius: 0.95rem;
-		content: '';
-		pointer-events: none;
-	}
-
-	.hero-header.is-minimal::before,
-	.hero-header.is-minimal::after,
-	.hero-header.is-minimal .brand-panel::after,
-	.hero-cta-panel.is-minimal::after {
+	.hero-header.is-minimal::before {
 		display: none;
 	}
 
@@ -215,7 +178,7 @@ const links = [
 		.hero-header { width: var(--hero-panel-width, calc(100% - 0.6rem)); }
 		.hero-nav { display: none; }
 		.brand-mark {
-			height: var(--hero-logo-width-mobile, 1.7rem);
+			height: var(--hero-logo-width-mobile, 1.55rem);
 		}
 		.hero-cta-panel {
 			top: var(--hero-gap, 0.6rem);
@@ -226,7 +189,6 @@ const links = [
 			background: transparent;
 		}
 
-		.hero-cta-panel::after { display: none; }
 		.mobile-navigation {
 			position: absolute;
 			top: var(--hero-gap, 0.6rem);
@@ -258,6 +220,7 @@ const links = [
 	@media (max-width: 420px) {
 		.hero-header {
 			--hero-brand-width: 3.8rem;
+			--hero-logo-width-mobile: 1.85rem;
 		}
 	}
 </style>
