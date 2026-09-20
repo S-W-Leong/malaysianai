@@ -1,0 +1,169 @@
+---
+import { ANNOUNCEMENT_ID } from '../lib/announcement';
+---
+
+<div
+	class="site-banner"
+	data-site-banner
+	data-banner-id={ANNOUNCEMENT_ID}
+	role="region"
+	aria-label="Announcement"
+	transition:persist="site-announcement"
+	transition:name="site-announcement"
+>
+	<a class="site-banner-link" href="/residency">
+		Applications for the 1st Oct residency now open. <span class="site-banner-more">Learn more</span>
+	</a>
+	<button type="button" class="site-banner-dismiss" data-site-banner-dismiss aria-label="Dismiss announcement">
+		<span aria-hidden="true">×</span>
+	</button>
+</div>
+
+<script>
+	import { ANNOUNCEMENT_ID, ANNOUNCEMENT_STORAGE_KEY } from '../lib/announcement';
+
+	function isDismissed() {
+		try {
+			return localStorage.getItem(ANNOUNCEMENT_STORAGE_KEY) === ANNOUNCEMENT_ID;
+		} catch {
+			return false;
+		}
+	}
+
+	function hideBanners(doc = document) {
+		doc.documentElement.dataset.announcement = 'hidden';
+		doc.querySelectorAll<HTMLElement>('[data-site-banner]').forEach(banner => {
+			banner.hidden = true;
+		});
+	}
+
+	function dismiss() {
+		try {
+			localStorage.setItem(ANNOUNCEMENT_STORAGE_KEY, ANNOUNCEMENT_ID);
+		} catch {
+			// Private mode can block storage; still hide for this visit.
+		}
+		hideBanners();
+	}
+
+	let bannerController: AbortController | undefined;
+
+	function prepareBanner() {
+		bannerController?.abort();
+		bannerController = new AbortController();
+		const { signal } = bannerController;
+
+		if (isDismissed()) hideBanners();
+
+		document.querySelectorAll<HTMLButtonElement>('[data-site-banner-dismiss]').forEach(button => {
+			button.addEventListener('click', event => {
+				event.preventDefault();
+				event.stopPropagation();
+				dismiss();
+			}, { signal });
+		});
+	}
+
+	document.addEventListener('astro:page-load', prepareBanner);
+	document.addEventListener('astro:before-swap', event => {
+		bannerController?.abort();
+		if (isDismissed()) hideBanners(event.newDocument);
+	});
+</script>
+
+<style>
+	.site-banner {
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: center;
+		border-bottom: 1px solid var(--hairline);
+		color: var(--text-heading);
+		background: var(--surface-background);
+		font: 400 0.82rem / 1.35 var(--font-body);
+	}
+
+	.site-banner-link {
+		grid-column: 1 / -1;
+		grid-row: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 2.4rem;
+		padding: 0.4rem 2.6rem 0.4rem 1rem;
+		color: inherit;
+		text-align: center;
+		text-decoration: none;
+		text-wrap: pretty;
+	}
+
+	.site-banner-more {
+		color: var(--text-accent);
+		text-decoration: underline;
+		text-underline-offset: 0.22em;
+		white-space: nowrap;
+	}
+
+	.site-banner-link:hover .site-banner-more,
+	.site-banner-link:focus-visible .site-banner-more {
+		color: var(--text-hover);
+	}
+
+	.site-banner-link:focus-visible {
+		outline: 2px solid var(--focus-color);
+		outline-offset: -3px;
+	}
+
+	.site-banner-dismiss {
+		grid-column: 2;
+		grid-row: 1;
+		z-index: 1;
+		display: inline-grid;
+		width: 1.85rem;
+		height: 1.85rem;
+		margin-right: 0.3rem;
+		place-items: center;
+		border: 0;
+		border-radius: var(--button-radius);
+		color: var(--text-muted);
+		background: transparent;
+		font: 400 1.2rem / 1 var(--font-body);
+		cursor: pointer;
+	}
+
+	.site-banner-dismiss:hover,
+	.site-banner-dismiss:focus-visible {
+		color: var(--text-heading);
+	}
+
+	.site-banner-dismiss:focus-visible {
+		outline: 2px solid var(--focus-color);
+		outline-offset: 2px;
+	}
+
+	.site-banner[hidden],
+	:global(html[data-announcement='hidden']) .site-banner {
+		display: none;
+	}
+
+	@media (max-width: 700px) {
+		.site-banner {
+			font-size: 0.72rem;
+		}
+
+		.site-banner-link {
+			justify-content: flex-start;
+			min-height: 2.15rem;
+			padding: 0.4rem 2.4rem 0.4rem 0.85rem;
+			text-align: left;
+		}
+
+		.site-banner-dismiss {
+			width: 1.7rem;
+			height: 1.7rem;
+			margin-right: 0.2rem;
+		}
+	}
+</style>

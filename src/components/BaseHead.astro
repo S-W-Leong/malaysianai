@@ -67,6 +67,10 @@ const structuredData = {
 		root.dataset.theme = theme;
 		root.dataset.themePreference = preference;
 		root.style.colorScheme = theme;
+		// Keep these strings aligned with src/lib/announcement.ts.
+		if (localStorage.getItem('malaysianai-announcement') === 'residency-oct-2026') {
+			root.dataset.announcement = 'hidden';
+		}
 		const themeColor = document.querySelector('meta[name="theme-color"]');
 		if (themeColor) themeColor.setAttribute('content', theme === 'light' ? '#f4efe6' : '#06090f');
 	})();
