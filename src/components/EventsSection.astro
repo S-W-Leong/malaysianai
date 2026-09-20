@@ -704,6 +704,9 @@ const backgroundSizes = '100vw';
 
 		.events-header h2 {
 			font-size: clamp(2.2rem, 10vw, 3.2rem);
+			/* Mobile drops the SVG title pocket, so this sits on the photo. */
+			color: var(--color-white);
+			text-shadow: 0 0.15rem 1.75rem rgba(2, 12, 13, 0.35);
 		}
 
 		.events-calendar-link {
