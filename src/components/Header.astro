@@ -1,7 +1,13 @@
 ---
 import FramedChrome from './FramedChrome.astro';
 
-const current = Astro.url.pathname.startsWith('/blog') ? 'stories' : Astro.url.pathname === '/about' ? 'about' : undefined;
+const current = Astro.url.pathname.startsWith('/blog')
+	? 'stories'
+	: Astro.url.pathname === '/about'
+		? 'about'
+		: Astro.url.pathname.startsWith('/residency')
+			? 'residency'
+			: undefined;
 ---
 
 <div class="site-header">
@@ -17,8 +23,8 @@ const current = Astro.url.pathname.startsWith('/blog') ? 'stories' : Astro.url.p
 		--hero-panel-width: 38rem;
 		--hero-control-height: 2.25rem;
 		--hero-header-height: calc(var(--hero-gap) * 2 + var(--hero-control-height));
-		--hero-brand-width: 10.25rem;
-		--hero-logo-width: 1.45rem;
+		--hero-brand-width: 11.5rem;
+		--hero-logo-width: 1.85rem;
 		position: relative;
 		isolation: isolate;
 		height: var(--hero-header-height);
@@ -32,8 +38,8 @@ const current = Astro.url.pathname.startsWith('/blog') ? 'stories' : Astro.url.p
 			--hero-gap: 0.55rem;
 			--hero-panel-width: calc(100% - 0.6rem);
 			--hero-control-height: 2rem;
-			--hero-brand-width: 8.25rem;
-			--hero-logo-width-mobile: 1.3rem;
+			--hero-brand-width: 9.4rem;
+			--hero-logo-width-mobile: 1.55rem;
 			height: var(--hero-header-height);
 		}
 	}
@@ -41,7 +47,7 @@ const current = Astro.url.pathname.startsWith('/blog') ? 'stories' : Astro.url.p
 	@media (max-width: 420px) {
 		.site-header {
 			--hero-brand-width: 3.8rem;
-			--hero-logo-width-mobile: 1.75rem;
+			--hero-logo-width-mobile: 1.85rem;
 		}
 	}
 </style>
