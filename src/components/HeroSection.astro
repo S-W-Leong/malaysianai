@@ -1,41 +1,91 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import heroArt from '../assets/hero-fibonacci.png';
 import heroArtDay from '../assets/hero-fibonacci-day.png';
 import FramedChrome from './FramedChrome.astro';
 import { LUMA_URL } from '../consts';
+
+const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672], format: 'webp', quality: 85 });
 ---
 
 <div class="hero-shell">
 	<div class="hero-media">
-		<Image
-			class="hero-art hero-art-night"
-			src={heroArt}
-			format="webp"
-			widths={[640, 1024, 1672]}
-			sizes="max(100vw, 178svh)"
-			quality={85}
-			alt=""
-			width="1672"
-			height="941"
-			fetchpriority="high"
-			loading="eager"
-			decoding="async"
-		/>
-		<Image
-			class="hero-art hero-art-day"
-			src={heroArtDay}
-			format="webp"
-			widths={[640, 1024, 1672]}
-			sizes="max(100vw, 178svh)"
-			quality={85}
-			alt=""
-			width="1672"
-			height="941"
-			fetchpriority="high"
-			loading="eager"
-			decoding="async"
-		/>
+		<template data-hero-theme="dark">
+			<Image
+				class="hero-art hero-art-night"
+				src={heroArt}
+				format="webp"
+				widths={[640, 1024, 1672]}
+				sizes="max(100vw, 178svh)"
+				quality={85}
+				alt=""
+				width="1672"
+				height="941"
+				fetchpriority="high"
+				loading="eager"
+				decoding="async"
+			/>
+		</template>
+		<template data-hero-theme="light">
+			<Image
+				class="hero-art hero-art-day"
+				src={heroArtDay}
+				format="webp"
+				widths={[640, 1024, 1672]}
+				sizes="max(100vw, 178svh)"
+				quality={85}
+				alt=""
+				width="1672"
+				height="941"
+				fetchpriority="high"
+				loading="eager"
+				decoding="async"
+			/>
+		</template>
+		<noscript>
+			<picture>
+				<source media="(prefers-color-scheme: light)" srcset={dayFallback.srcSet.attribute} sizes="max(100vw, 178svh)" />
+				<Image class="hero-art" src={heroArt} format="webp" widths={[640, 1024, 1672]} sizes="max(100vw, 178svh)" quality={85} alt="" fetchpriority="high" loading="eager" />
+			</picture>
+		</noscript>
+		<script is:inline data-astro-rerun>
+			(() => {
+				// Templates keep the inactive theme out of the preload scanner. Run here,
+				// during parsing, so the active hero need not wait for the page-load event.
+				const media = document.currentScript.parentElement;
+				let selectedTheme;
+				let sequence = 0;
+				const update = async () => {
+					const theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+					if (theme === selectedTheme) return;
+					selectedTheme = theme;
+					const change = ++sequence;
+					const next = document.importNode(media.querySelector(`[data-hero-theme="${theme}"]`).content.querySelector('img'), true);
+					const current = media.querySelector(':scope > .hero-art');
+					if (!current) {
+						media.append(next);
+						return;
+					}
+					// Leave the old artwork visible while the requested theme downloads.
+					try {
+						await next.decode();
+					} catch {
+						if (change === sequence) selectedTheme = undefined;
+						return;
+					}
+					if (change !== sequence || !media.isConnected) return;
+					next.style.animation = 'none';
+					current.replaceWith(next);
+				};
+				void update();
+				const observer = new MutationObserver(update);
+				observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+				document.addEventListener('astro:before-swap', () => {
+					sequence++;
+					observer.disconnect();
+				}, { once: true });
+			})();
+		</script>
 		<div class="hero-shade" aria-hidden="true"></div>
 	</div>
 
@@ -121,18 +171,6 @@ import { LUMA_URL } from '../consts';
 		animation: hero-settle 1.8s 0.05s cubic-bezier(0.2, 0.72, 0.2, 1) both;
 	}
 
-	.hero-art-day {
-		display: none;
-	}
-
-	:global(html[data-theme='light']) .hero-art-night {
-		display: none;
-	}
-
-	:global(html[data-theme='light']) .hero-art-day {
-		display: block;
-	}
-
 	.hero-shade {
 		z-index: 1;
 		background:
@@ -147,14 +185,6 @@ import { LUMA_URL } from '../consts';
 	}
 
 	@media (prefers-color-scheme: light) {
-		:global(html:not([data-theme='dark'])) .hero-art-night {
-			display: none;
-		}
-
-		:global(html:not([data-theme='dark'])) .hero-art-day {
-			display: block;
-		}
-
 		:global(html:not([data-theme='dark'])) .hero-shade {
 			background:
 				linear-gradient(180deg, rgb(20 52 73 / 0.06), transparent 42%, rgb(16 43 42 / 0.16) 100%),
