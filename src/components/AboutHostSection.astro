@@ -30,7 +30,7 @@
 
 <style>
 	.about-host {
-		padding: clamp(0.75rem, 1.6vw, 1.5rem);
+		padding: var(--section-space-half) clamp(0.75rem, 1.6vw, 1.5rem) 0;
 		color: var(--text-bright);
 		background: var(--page-background);
 	}
@@ -38,7 +38,7 @@
 	.about-host-frame {
 		position: relative;
 		overflow: hidden;
-		min-height: min(54rem, 92svh);
+		min-height: 0;
 		padding: clamp(2rem, 4vw, 3.5rem) clamp(1.5rem, 3.5vw, 3.25rem);
 	}
 
@@ -93,7 +93,7 @@
 		gap: clamp(3rem, 9vw, 10rem);
 		align-items: end;
 		width: min(72rem, 100%);
-		margin-top: clamp(7rem, 15vh, 12rem);
+		margin-top: clamp(4.5rem, 8vh, 7rem);
 		margin-left: auto;
 		padding-top: clamp(1.5rem, 3vw, 2.5rem);
 		border-top: 1px solid var(--hairline-soft);
@@ -166,7 +166,7 @@
 
 	@media (max-width: 700px) {
 		.about-host {
-			padding: 0.65rem;
+			padding: 2.75rem 0.65rem 0;
 		}
 
 		.about-host-frame {

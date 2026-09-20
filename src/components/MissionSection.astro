@@ -39,9 +39,8 @@ import bungaRaya from '../assets/malaysian-ai-bunga-raya-pixel.png';
 	.mission-section {
 		position: relative;
 		display: grid;
-		height: 100dvh;
-		max-height: 100dvh;
-		padding: clamp(2.5rem, 5vh, 4.5rem) clamp(1.25rem, 6vw, 6rem);
+		min-height: 100dvh;
+		padding: var(--section-space) clamp(1.25rem, 6vw, 6rem);
 		overflow: hidden;
 		color: var(--text-heading);
 		background: var(--page-background);
@@ -164,7 +163,7 @@ import bungaRaya from '../assets/malaysian-ai-bunga-raya-pixel.png';
 
 		.mission-section {
 			min-height: auto;
-			padding: 7rem 1.25rem 5rem;
+			padding: 8.5rem 1.25rem 7rem;
 		}
 
 	}
