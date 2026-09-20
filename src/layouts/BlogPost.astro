@@ -87,7 +87,7 @@ const shareImage = image ? await getImage({ src: image, width: 1200, format: 'we
 		const openImage = (image: HTMLImageElement, fullSrc?: string) => {
 			if (!viewerImage) return;
 			previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-			viewerImage.src = fullSrc || image.currentSrc || image.src;
+			viewerImage.src = fullSrc || image.dataset.fullImage || image.currentSrc || image.src;
 			viewerImage.alt = image.alt;
 			viewer.showModal();
 			document.body.classList.add('has-image-viewer');

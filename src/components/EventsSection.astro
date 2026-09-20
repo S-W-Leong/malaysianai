@@ -94,8 +94,6 @@ const backgroundSizes = '100vw';
 				<img
 					class="events-background-image"
 					data-events-background="1"
-					src={events[1].background.src}
-					srcset={events[1].background.srcSet.attribute}
 					sizes={backgroundSizes}
 					width={events[1].background.attributes.width}
 					height={events[1].background.attributes.height}
@@ -185,6 +183,19 @@ const backgroundSizes = '100vw';
 		let rotationTimer: number | undefined;
 		const controller = new AbortController();
 		const { signal } = controller;
+		const warmedImages = new Map<string, HTMLImageElement>();
+
+		function warmNextBackground() {
+			if (reduceMotion.matches || document.hidden) return;
+			const card = cards[(selectedIndex + 1) % cards.length];
+			const src = card?.dataset.image;
+			if (!src || warmedImages.has(src)) return;
+			const image = new window.Image();
+			image.sizes = backgrounds[0]?.sizes || '100vw';
+			image.srcset = card.dataset.srcset ?? '';
+			image.src = src;
+			warmedImages.set(src, image);
+		}
 
 		function stopRotation() {
 			if (rotationTimer === undefined) return;
@@ -237,18 +248,17 @@ const backgroundSizes = '100vw';
 			nextBackground.srcset = card.dataset.srcset ?? '';
 			nextBackground.src = card.dataset.image;
 			nextBackground.style.objectPosition = card.dataset.position ?? 'center';
-			if (!reduceMotion.matches) {
-				try {
-					await nextBackground.decode();
-				} catch {
-					// The browser can still display the image if decode is interrupted.
-				}
+			try {
+				await nextBackground.decode();
+			} catch {
+				return; // Keep the previous photo visible if the replacement fails.
 			}
 			if (currentChange !== changeSequence) return;
 
 			nextBackground.classList.add('is-visible');
 			currentBackground.classList.remove('is-visible');
 			visibleBackground = nextBackgroundIndex;
+			if (sectionIsVisible) warmNextBackground();
 		}
 
 		cards.forEach((card, index) => {
@@ -282,6 +292,14 @@ const backgroundSizes = '100vw';
 			},
 			{ threshold: 0.18 },
 		);
+		// Give the next slide a head start near the section, without competing
+		// with the hero on initial navigation.
+		const preloadObserver = new IntersectionObserver(([entry]) => {
+			if (!entry.isIntersecting) return;
+			warmNextBackground();
+			preloadObserver.disconnect();
+		}, { rootMargin: '400px' });
+		preloadObserver.observe(section);
 
 		layoutCards();
 		observer.observe(section);
@@ -298,6 +316,7 @@ const backgroundSizes = '100vw';
 		return () => {
 			stopRotation();
 			observer.disconnect();
+			preloadObserver.disconnect();
 			controller.abort();
 			reduceMotion.removeEventListener('change', startRotation);
 			changeSequence++;

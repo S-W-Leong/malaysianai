@@ -12,6 +12,7 @@ async function filesIn(directory) {
 function* elements(node) {
 	if (node.tagName) yield node;
 	for (const child of node.childNodes ?? []) yield* elements(child);
+	if (node.content) yield* elements(node.content);
 }
 const files = await filesIn(root);
 const available = new Set(files);

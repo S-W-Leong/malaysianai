@@ -19,7 +19,7 @@ test('public destinations load and the hero uses responsive images', async ({ pa
 	}
 	await page.goto('/');
 	const heroImages = page.locator('.hero-art');
-	await expect(heroImages).toHaveCount(2);
+	await expect(heroImages).toHaveCount(1);
 	const heroSources = await heroImages.evaluateAll((images: HTMLImageElement[]) =>
 		images.map(image => ({ loaded: image.complete && image.naturalWidth > 0, srcset: image.srcset })),
 	);
@@ -28,6 +28,58 @@ test('public destinations load and the hero uses responsive images', async ({ pa
 		expect(image.loaded).toBe(true);
 	}
 	expect(errors).toEqual([]);
+});
+
+test('hero fetches one theme and keeps artwork visible during a delayed theme switch', async ({ page }) => {
+	await page.emulateMedia({ colorScheme: 'dark' });
+	const heroRequests: string[] = [];
+	page.on('request', request => {
+		if (request.url().includes('/_astro/hero-fibonacci')) heroRequests.push(request.url());
+	});
+	await page.goto('/');
+	const hero = page.locator('.hero-media > .hero-art');
+	await expect(hero).toHaveClass(/hero-art-night/);
+	expect(heroRequests).toHaveLength(1);
+	expect(heroRequests[0]).not.toContain('hero-fibonacci-day');
+
+	let releaseImage!: () => void;
+	const imageGate = new Promise<void>(resolve => { releaseImage = resolve; });
+	await page.route('**/_astro/hero-fibonacci-day*', async route => {
+		await imageGate;
+		await route.continue();
+	});
+	await page.getByRole('radio', { name: 'Light' }).click();
+	await expect.poll(() => heroRequests.length).toBe(2);
+	await expect(hero).toHaveClass(/hero-art-night/);
+	expect(await hero.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+	releaseImage();
+	await expect(hero).toHaveClass(/hero-art-day/);
+
+	// A stored override must win over the OS without requesting the OS artwork.
+	heroRequests.length = 0;
+	await page.reload();
+	await expect(hero).toHaveClass(/hero-art-day/);
+	expect(heroRequests).toHaveLength(1);
+	expect(heroRequests[0]).toContain('hero-fibonacci-day');
+	await page.locator('.footer-company').getByRole('link', { name: 'About', exact: true }).click();
+	await page.locator('.footer-brand').click();
+	await expect(hero).toHaveClass(/hero-art-day/);
+	await page.getByRole('radio', { name: 'Dark' }).click();
+	await expect(hero).toHaveClass(/hero-art-night/);
+});
+
+test('event background preloading starts near the section', async ({ page }) => {
+	const images: string[] = [];
+	page.on('request', request => { if (request.resourceType() === 'image') images.push(request.url()); });
+	await page.emulateMedia({ reducedMotion: 'no-preference' });
+	await page.goto('/');
+	const second = page.locator('[data-event-card]').nth(1);
+	const sources = (await second.getAttribute('data-srcset'))!.split(',').map(source => source.trim().split(' ')[0]);
+	expect(images.some(url => sources.some(src => url.endsWith(src)))).toBe(false);
+	await page.locator('#events').scrollIntoViewIfNeeded();
+	await expect.poll(() => images.some(url => sources.some(src => url.endsWith(src)))).toBe(true);
+	await second.click();
+	await expect.poll(() => page.locator('[data-events-background].is-visible').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0 && image.currentSrc.includes('aimto-learnathon'))).toBe(true);
 });
 
 test('homepage copy points people at communities and the add-community contact flow', async ({ page }) => {
@@ -73,6 +125,11 @@ test('image dialog contains keyboard focus, closes and survives page navigation'
 	await page.locator('.lead-image').click();
 	await cover.click();
 	await expect(dialog).toBeVisible();
+	await page.keyboard.press('Escape');
+	const bodyImage = page.locator('.story-body img').first();
+	await expect(bodyImage).toHaveAttribute('srcset', /400w.*640w.*960w/);
+	await bodyImage.click();
+	await expect(page.locator('.image-viewer-image')).toHaveAttribute('src', '/images/blog/largest-ai-learnathon/record-certificate.webp');
 	await page.keyboard.press('Escape');
 	expect(errors).toEqual([]);
 });
@@ -180,7 +237,10 @@ test('event autoplay advances over the background and resumes after card interac
 		const pausedTitle = await title.textContent();
 		await page.waitForTimeout(4300);
 		await expect(title).toHaveText(pausedTitle!);
-		await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+		// Hovering a transformed card can scroll it into view. The earlier
+		// section coordinates may now hit another card, keeping autoplay paused.
+		await page.mouse.move(8, 8);
+		await expect(page.locator('[data-event-card]:hover')).toHaveCount(0);
 		await expect(title).not.toHaveText(pausedTitle!, { timeout: 6500 });
 		await thirdCard.focus();
 		const focusedTitle = await title.textContent();
