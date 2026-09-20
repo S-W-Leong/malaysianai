@@ -274,7 +274,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 		--hero-logo-width: 1.95rem;
 		--hero-control-height: 2.25rem;
 		--hero-header-height: calc(var(--hero-gap) * 2 + var(--hero-control-height));
-		min-height: max(46rem, 100svh);
+		min-height: max(46rem, calc(100svh - var(--announcement-height)));
 		padding: var(--hero-gap);
 		background: var(--hero-frame);
 	}
@@ -504,7 +504,7 @@ const dayFallback = await getImage({ src: heroArtDay, widths: [640, 1024, 1672],
 			--hero-brand-width: 9.6rem;
 			--hero-logo-width-mobile: 1.6rem;
 			--hero-control-height: 2rem;
-			min-height: max(42rem, 100svh);
+			min-height: max(42rem, calc(100svh - var(--announcement-height)));
 			padding: var(--hero-gap);
 		}
 

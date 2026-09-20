@@ -345,3 +345,27 @@ test('Tizen follows the system scheme and can lock dark cutouts', async ({ brows
 	await expect(page.locator('.hero-card h1')).toHaveCSS('color', 'rgb(255, 253, 246)');
 	await context.close();
 });
+
+test('residency announcement banner opens the residency page and can be dismissed', async ({ page }) => {
+	await page.goto('/');
+	const banner = page.getByRole('region', { name: 'Announcement' });
+	await expect(banner).toBeVisible();
+	await expect(banner).toContainText('Applications for the 1st Oct residency now open.');
+	await expect(banner.getByRole('link', { name: /learn more/i })).toHaveAttribute('href', '/residency');
+
+	await banner.click({ position: { x: 24, y: 12 } });
+	await expect(page).toHaveURL(/\/residency\/?$/);
+	await expect(page.getByRole('heading', { level: 1 })).toContainText('The AI Residency');
+	await expect(banner).toBeVisible();
+
+	await banner.getByRole('button', { name: 'Dismiss announcement' }).click();
+	await expect(banner).toBeHidden();
+	await expect(page).toHaveURL(/\/residency\/?$/);
+	expect(await page.evaluate(() => localStorage.getItem('malaysianai-announcement'))).toBe('residency-oct-2026');
+
+	await page.goto('/');
+	await expect(banner).toBeHidden();
+	await page.locator('.footer-company').getByRole('link', { name: 'About', exact: true }).click();
+	await expect(page).toHaveURL(/\/about\/?$/);
+	await expect(banner).toBeHidden();
+});
