@@ -8,7 +8,7 @@ export const ADD_COMMUNITY_HREF =
 export const ADD_COMMUNITY_WHATSAPP =
 	'https://wa.me/60109847954?text=' +
 	encodeURIComponent("Hi, I'd like to add my community to the directory.");
-export const APPLY_FORM_URL = 'https://airtable.com/appBgmnpu1bJljnxX/pagEZn6n60tDty3lP';
+export const APPLY_FORM_URL = 'https://platform.malaysian.ai';
 export const APPLY_EMBED_URL = 'https://airtable.com/embed/appBgmnpu1bJljnxX/pagEZn6n60tDty3lP';
 export const SHOW_AND_TELL_WHATSAPP =
 	'https://wa.me/60109847954?text=Hi%2C%20I%27d%20like%20to%20join%20a%20Show%20and%20Tell%20Thursday.';
